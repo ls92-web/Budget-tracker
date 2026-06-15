@@ -1,0 +1,112 @@
+<!-- @dsCard group="Dashboard" -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; -webkit-font-smoothing: antialiased; background: #f8f9fc; padding: 24px; display: flex; gap: 16px; height: 520px; }
+.chat { flex: 1; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.chat-header { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid #e2e8f0; }
+.ai-icon { width: 36px; height: 36px; border-radius: 12px; background: #eef2ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ai-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+.ai-status { font-size: 11px; color: #10b981; }
+.messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.msg { display: flex; gap: 10px; }
+.msg.user { flex-direction: row-reverse; }
+.msg-avatar { width: 30px; height: 30px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.bubble { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.5; white-space: pre-line; }
+.bubble.ai { background: #f1f3f8; color: #0f172a; }
+.bubble.user { background: #6366f1; color: #fff; }
+.chips { display: flex; gap: 6px; padding: 8px 16px; overflow-x: auto; border-top: 1px solid #f1f5f9; }
+.chip { padding: 6px 12px; border-radius: 10px; font-size: 11px; background: #f1f3f8; color: #475569; border: 1px solid #e2e8f0; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+.input-row { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid #e2e8f0; }
+.input-row input { flex: 1; padding: 9px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f1f3f8; font-size: 13px; color: #0f172a; outline: none; font-family: inherit; }
+.send-btn { padding: 9px 14px; border-radius: 12px; background: #6366f1; color: #fff; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; font-family: inherit; }
+.typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; background: #f1f3f8; border-radius: 16px; width: fit-content; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: #94a3b8; animation: bounce .9s infinite; }
+.dot:nth-child(2) { animation-delay: .15s; }
+.dot:nth-child(3) { animation-delay: .3s; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+
+/* sidebar */
+.sidebar { width: 220px; display: flex; flex-direction: column; gap: 12px; }
+.side-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.side-title { font-size: 11px; font-weight: 600; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.insight { display: flex; gap: 8px; padding: 8px 10px; background: #f8f9fc; border-radius: 10px; margin-bottom: 6px; font-size: 11px; line-height: 1.4; color: #475569; }
+.stat-row { display: flex; justify-content: space-between; font-size: 11px; padding: 5px 0; border-bottom: 1px solid #f1f5f9; }
+.example { display: block; width: 100%; text-align: left; padding: 7px 10px; border-radius: 8px; background: #f8f9fc; font-size: 11px; color: #6366f1; font-style: italic; border: none; cursor: pointer; margin-bottom: 5px; font-family: inherit; }
+</style>
+</head>
+<body>
+<!-- Chat panel -->
+<div class="chat">
+  <div class="chat-header">
+    <div class="ai-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+    <div><div class="ai-name">Finio AI</div><div class="ai-status">Online · Ready to help</div></div>
+  </div>
+  <div class="messages">
+    <div class="msg">
+      <div class="msg-avatar" style="background:#eef2ff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div class="bubble ai">Hello! I'm your financial AI assistant. I can help you:
+
+• Answer questions about your spending
+• Analyze your financial habits
+• Add expenses using natural language
+
+Try: "How much did I spend this month?"</div>
+    </div>
+    <div class="msg user">
+      <div class="msg-avatar" style="background:#f1f3f8"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="bubble user">Add $45 at Starbucks yesterday</div>
+    </div>
+    <div class="msg">
+      <div class="msg-avatar" style="background:#eef2ff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div class="bubble ai">I found a transaction:
+
+• Amount: $45.00
+• Merchant: Starbucks
+• Category: Food & Dining
+• Date: Jun 13, 2026
+
+Should I add this expense?</div>
+    </div>
+    <div class="msg">
+      <div class="msg-avatar" style="background:#eef2ff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    </div>
+  </div>
+  <div class="chips">
+    <div class="chip">How much did I spend?</div>
+    <div class="chip">Biggest category?</div>
+    <div class="chip">Savings rate?</div>
+    <div class="chip">Money saving tip</div>
+  </div>
+  <div class="input-row">
+    <input placeholder='Ask a question or say "Add $50 at Whole Foods"'>
+    <button class="send-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send</button>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="side-card">
+    <div class="side-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Spending Insights</div>
+    <div class="insight"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Food & Dining is 32% of spending — above the 20% target.</div>
+    <div class="insight"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="flex-shrink:0;margin-top:1px"><polyline points="20 6 9 17 4 12"/></svg>Excellent savings rate of 50.1%!</div>
+  </div>
+  <div class="side-card">
+    <div class="side-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg> This Month</div>
+    <div class="stat-row"><span style="color:#94a3b8">Income</span><span style="color:#10b981;font-weight:600">$6,500</span></div>
+    <div class="stat-row"><span style="color:#94a3b8">Expenses</span><span style="color:#ef4444;font-weight:600">$3,240</span></div>
+    <div class="stat-row" style="border:none"><span style="color:#94a3b8">Balance</span><span style="color:#6366f1;font-weight:600">$3,260</span></div>
+  </div>
+  <div class="side-card">
+    <div class="side-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Quick Entry</div>
+    <button class="example">"Add $12.50 at Starbucks"</button>
+    <button class="example">"Spent $85 on groceries"</button>
+    <button class="example">"Paid $150 for electricity"</button>
+  </div>
+</div>
+</body>
+</html>

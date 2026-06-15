@@ -1,0 +1,83 @@
+<!-- @dsCard group="Dashboard" -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; -webkit-font-smoothing: antialiased; padding: 32px; background: #f8f9fc; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+.icon-wrap { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.card-name { font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 2px; }
+.card-desc { font-size: 11px; color: #94a3b8; }
+.actions { display: flex; gap: 4px; }
+.icon-btn { width: 26px; height: 26px; border-radius: 8px; background: #f1f3f8; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.amounts { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 12px; }
+.current { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.pct { font-size: 22px; font-weight: 700; }
+.sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+.bar-track { height: 10px; background: #f1f3f8; border-radius: 999px; overflow: hidden; margin-bottom: 12px; }
+.bar-fill { height: 100%; border-radius: 999px; }
+.card-foot { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; }
+.deposit-btn { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 8px; border: none; cursor: pointer; font-size: 11px; font-weight: 500; font-family: inherit; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <!-- Emergency Fund - in progress -->
+  <div class="card">
+    <div class="card-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="icon-wrap" style="background:#6366f118"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div><div class="card-name">Emergency Fund</div><div class="card-desc">6-month safety net</div></div>
+      </div>
+      <div class="actions">
+        <button class="deposit-btn" style="background:#6366f118;color:#6366f1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+      </div>
+    </div>
+    <div class="amounts">
+      <div><div class="current" style="color:#6366f1">$8,500</div><div class="sub">of $15,000</div></div>
+      <div style="text-align:right"><div class="pct" style="color:#0f172a">57%</div></div>
+    </div>
+    <div class="bar-track"><div class="bar-fill" style="width:57%;background:#6366f1"></div></div>
+    <div class="card-foot"><span>$6,500 to go</span><span>Dec 2026</span></div>
+  </div>
+
+  <!-- Vacation - almost done -->
+  <div class="card">
+    <div class="card-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="icon-wrap" style="background:#14b8a618"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg></div>
+        <div><div class="card-name">Japan Vacation</div><div class="card-desc">Summer 2026 trip</div></div>
+      </div>
+      <button class="deposit-btn" style="background:#14b8a618;color:#14b8a6"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+    </div>
+    <div class="amounts">
+      <div><div class="current" style="color:#14b8a6">$4,750</div><div class="sub">of $5,000</div></div>
+      <div style="text-align:right"><div class="pct" style="color:#0f172a">95%</div></div>
+    </div>
+    <div class="bar-track"><div class="bar-fill" style="width:95%;background:#14b8a6"></div></div>
+    <div class="card-foot"><span>$250 to go</span><span style="color:#f59e0b">28d left</span></div>
+  </div>
+
+  <!-- Completed -->
+  <div class="card">
+    <div class="card-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="icon-wrap" style="background:#10b98118"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><div class="card-name">New Laptop</div><div class="card-desc">Work equipment</div></div>
+      </div>
+      <button class="deposit-btn" style="background:#10b98118;color:#10b981"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+    </div>
+    <div class="amounts">
+      <div><div class="current" style="color:#10b981">$2,500</div><div class="sub">of $2,500</div></div>
+      <div style="text-align:right"><div class="pct" style="color:#10b981">100%</div><div style="font-size:11px;color:#10b981;font-weight:500">Complete</div></div>
+    </div>
+    <div class="bar-track"><div class="bar-fill" style="width:100%;background:#10b981"></div></div>
+    <div class="card-foot"><span style="color:#10b981">Goal achieved!</span><span>May 2026</span></div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; -webkit-font-smoothing: antialiased; padding: 32px; background: #f8f9fc; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.section { margin-bottom: 20px; }
+h2 { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; margin-bottom: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+label { font-size: 11px; font-weight: 500; color: #475569; }
+input, select, textarea { width: 100%; padding: 9px 12px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f1f3f8; font-size: 13px; color: #0f172a; outline: none; font-family: inherit; appearance: none; }
+input.focused { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,.15); background: #fff; }
+input.error { border-color: #ef4444; }
+.hint { font-size: 11px; color: #94a3b8; }
+.error-msg { font-size: 11px; color: #ef4444; }
+.input-wrap { position: relative; }
+.input-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+.input-wrap input { padding-left: 32px; }
+select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+.checkbox-row { display: flex; align-items: center; gap: 8px; }
+.checkbox-row input[type=checkbox] { width: 16px; height: 16px; accent-color: #6366f1; flex-shrink: 0; }
+.checkbox-row span { font-size: 13px; color: #0f172a; }
+.dark-bg { background: #111118; border-radius: 16px; padding: 20px; margin-top: 24px; }
+.dark-bg label { color: #94a3b8; }
+.dark-bg input, .dark-bg select { background: #16161f; border-color: #1e1e2d; color: #f1f5f9; }
+.dark-bg input.focused { border-color: #818cf8; box-shadow: 0 0 0 2px rgba(129,140,248,.15); background: #1e1e2d; }
+.dark-bg h2 { color: #475569; }
+.dark-bg .checkbox-row span { color: #f1f5f9; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <div>
+    <h2>Text Input</h2>
+    <div class="field"><label>Default</label><input placeholder="e.g. Starbucks, Amazon"></div>
+    <div class="field"><label>Focused</label><input class="focused" value="Netflix Subscription"></div>
+    <div class="field"><label>With Icon</label><div class="input-wrap"><svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search transactions..." style="padding-left:32px"></div></div>
+    <div class="field"><label>Error</label><input class="error" value="abc"><div class="error-msg">Please enter a valid amount</div></div>
+    <div class="field"><label>With Hint</label><input placeholder="e.g. Starbucks"><div class="hint">Category will be suggested automatically</div></div>
+  </div>
+  <div>
+    <h2>Select & Checkbox</h2>
+    <div class="field"><label>Select</label>
+      <select>
+        <option>Food & Dining</option>
+        <option>Transportation</option>
+        <option>Shopping</option>
+        <option>Health</option>
+      </select>
+    </div>
+    <div class="field"><label>Payment Method</label>
+      <select>
+        <option>Credit Card</option>
+        <option>Debit Card</option>
+        <option>Cash</option>
+        <option>Bank Transfer</option>
+      </select>
+    </div>
+    <div class="field"><label>Date</label><input type="date" value="2026-06-14"></div>
+    <div class="field" style="margin-top:8px">
+      <div class="checkbox-row"><input type="checkbox"><span>Recurring transaction</span></div>
+    </div>
+    <div class="field">
+      <div class="checkbox-row"><input type="checkbox" checked><span>Recurring transaction</span></div>
+      <div style="margin-top:6px"><select><option>Monthly</option><option>Weekly</option><option>Yearly</option></select></div>
+    </div>
+  </div>
+</div>
+<div class="dark-bg">
+  <h2>Dark Mode</h2>
+  <div class="grid" style="margin-top:12px">
+    <div><div class="field"><label>Default</label><input placeholder="e.g. Starbucks"></div>
+    <div class="field"><label>Focused</label><input class="focused" value="Netflix Subscription"></div></div>
+    <div><div class="field"><label>Category</label><select><option>Food & Dining</option><option>Shopping</option></select></div>
+    <div class="field"><div class="checkbox-row"><input type="checkbox" checked><span>Recurring</span></div></div></div>
+  </div>
+</div>
+</body>
+</html>

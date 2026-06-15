@@ -1,0 +1,67 @@
+<!-- @dsCard group="Foundation" -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; background: #f8f9fc; padding: 32px; -webkit-font-smoothing: antialiased; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.section { margin-bottom: 24px; }
+.label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; margin-bottom: 12px; }
+.type-row { display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
+.type-meta { font-size: 10px; color: #94a3b8; min-width: 80px; font-family: monospace; }
+.amount { font-size: 32px; font-weight: 700; color: #0f172a; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.amount-sm { font-size: 24px; font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; }
+.amount-xs { font-size: 18px; font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; }
+.badge-text { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: #6366f1; }
+.card-title { font-size: 15px; font-weight: 600; color: #0f172a; }
+.body { font-size: 14px; color: #0f172a; line-height: 1.5; }
+.caption { font-size: 12px; color: #475569; }
+.micro { font-size: 11px; color: #94a3b8; }
+.overline { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #94a3b8; }
+.gradient { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+</style>
+</head>
+<body>
+<div class="row">
+  <div>
+    <div class="section">
+      <div class="label">Numeric / Financial</div>
+      <div class="type-row"><span class="type-meta">32px 700</span><span class="amount">$4,280.00</span></div>
+      <div class="type-row"><span class="type-meta">24px 600</span><span class="amount-sm">$1,240.50</span></div>
+      <div class="type-row"><span class="type-meta">18px 600</span><span class="amount-xs">$380.00</span></div>
+    </div>
+    <div class="section">
+      <div class="label">Brand</div>
+      <div class="type-row"><span class="type-meta">32px 700</span><span style="font-size:32px;font-weight:700;" class="gradient">Finio</span></div>
+      <div class="type-row"><span class="type-meta">20px 600</span><span style="font-size:20px;font-weight:600;color:#0f172a;">Dashboard</span></div>
+    </div>
+  </div>
+  <div>
+    <div class="section">
+      <div class="label">UI Text</div>
+      <div class="type-row"><span class="type-meta">10px 600 UC</span><span class="overline">Monthly Income</span></div>
+      <div class="type-row"><span class="type-meta">11px 600</span><span class="badge-text">Food & Dining</span></div>
+      <div class="type-row"><span class="type-meta">15px 600</span><span class="card-title">Recent Transactions</span></div>
+      <div class="type-row"><span class="type-meta">14px 400</span><span class="body">Starbucks · Food & Dining</span></div>
+      <div class="type-row"><span class="type-meta">12px 400</span><span class="caption">Jun 14, 2026 · Credit Card</span></div>
+      <div class="type-row"><span class="type-meta">11px 400</span><span class="micro">3 transactions · This month</span></div>
+    </div>
+    <div class="section">
+      <div class="label">Spacing Scale</div>
+      <div style="display:flex;gap:8px;align-items:flex-end;margin-top:8px;">
+        <div style="text-align:center"><div style="width:4px;height:4px;background:#6366f1;border-radius:2px;margin:0 auto 4px"></div><span style="font-size:9px;color:#94a3b8">4</span></div>
+        <div style="text-align:center"><div style="width:8px;height:8px;background:#6366f1;border-radius:2px;margin:0 auto 4px"></div><span style="font-size:9px;color:#94a3b8">8</span></div>
+        <div style="text-align:center"><div style="width:12px;height:12px;background:#6366f1;border-radius:2px;margin:0 auto 4px"></div><span style="font-size:9px;color:#94a3b8">12</span></div>
+        <div style="text-align:center"><div style="width:16px;height:16px;background:#6366f1;border-radius:2px;margin:0 auto 4px"></div><span style="font-size:9px;color:#94a3b8">16</span></div>
+        <div style="text-align:center"><div style="width:20px;height:20px;background:#6366f1;border-radius:2px;margin:0 auto 4px"></div><span style="font-size:9px;color:#94a3b8">20</span></div>
+        <div style="text-align:center"><div style="width:24px;height:24px;background:#6366f1;border-radius:2px;margin:0 auto 4px"></div><span style="font-size:9px;color:#94a3b8">24</span></div>
+        <div style="text-align:center"><div style="width:32px;height:32px;background:#6366f1;border-radius:2px;margin:0 auto 4px"></div><span style="font-size:9px;color:#94a3b8">32</span></div>
+        <div style="text-align:center"><div style="width:40px;height:40px;background:#6366f1;border-radius:2px;margin:0 auto 4px"></div><span style="font-size:9px;color:#94a3b8">40</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

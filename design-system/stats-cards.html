@@ -1,0 +1,85 @@
+<!-- @dsCard group="Dashboard" -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; -webkit-font-smoothing: antialiased; padding: 32px; background: #f8f9fc; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.card-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; }
+.icon { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.amount { font-size: 24px; font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.trend { display: flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 11px; }
+/* dark grid */
+.dark-bg { background: #0a0a0f; border-radius: 16px; padding: 20px; }
+.dark-bg .card { background: #111118; border-color: #1e1e2d; }
+.dark-bg .amount { color: #f1f5f9; }
+</style>
+</head>
+<body>
+<!-- Light Mode -->
+<div class="grid">
+  <div class="card">
+    <div class="card-top">
+      <span class="card-label">Monthly Income</span>
+      <div class="icon" style="background:#10b98118"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    </div>
+    <div class="amount" style="color:#0f172a">$6,500.00</div>
+    <div class="trend" style="color:#10b981"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 8.2% vs last month</div>
+  </div>
+  <div class="card">
+    <div class="card-top">
+      <span class="card-label">Monthly Expenses</span>
+      <div class="icon" style="background:#ef444418"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg></div>
+    </div>
+    <div class="amount" style="color:#0f172a">$3,240.50</div>
+    <div class="trend" style="color:#ef4444"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg> 12.1% vs last month</div>
+  </div>
+  <div class="card">
+    <div class="card-top">
+      <span class="card-label">Net Balance</span>
+      <div class="icon" style="background:#6366f118"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+    </div>
+    <div class="amount" style="color:#6366f1">$3,259.50</div>
+    <div class="trend" style="color:#10b981"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 4.5% vs last month</div>
+  </div>
+  <div class="card">
+    <div class="card-top">
+      <span class="card-label">Savings Rate</span>
+      <div class="icon" style="background:#8b5cf618"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div>
+    </div>
+    <div class="amount" style="color:#8b5cf6">50.1%</div>
+    <div class="trend" style="color:#10b981"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Excellent rate</div>
+  </div>
+</div>
+
+<!-- Dark Mode -->
+<div class="dark-bg">
+  <div class="grid">
+    <div class="card">
+      <div class="card-top"><span class="card-label">Monthly Income</span><div class="icon" style="background:#10b98120"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div></div>
+      <div class="amount">$6,500.00</div>
+      <div class="trend" style="color:#34d399"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> 8.2%</div>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="card-label">Monthly Expenses</span><div class="icon" style="background:#f8717120"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg></div></div>
+      <div class="amount">$3,240.50</div>
+      <div class="trend" style="color:#f87171">▼ 12.1%</div>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="card-label">Net Balance</span><div class="icon" style="background:#818cf820"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div></div>
+      <div class="amount" style="color:#818cf8">$3,259.50</div>
+      <div class="trend" style="color:#34d399">▲ 4.5%</div>
+    </div>
+    <div class="card">
+      <div class="card-top"><span class="card-label">Savings Rate</span><div class="icon" style="background:#a78bfa20"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div></div>
+      <div class="amount" style="color:#a78bfa">50.1%</div>
+      <div class="trend" style="color:#34d399">▲ Excellent</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '@/lib/supabase'
+import { Budget } from '@/lib/types'
+
+export function useBudgets(month: number, year: number) {
+  const [budgets, setBudgets] = useState<Budget[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const fetch = useCallback(async () => {
+    setLoading(true)
+    const { data } = await supabase
+      .from('budgets')
+      .select('*')
+      .eq('month', month)
+      .eq('year', year)
+      .order('category')
+    setBudgets(data || [])
+    setLoading(false)
+  }, [month, year])
+
+  useEffect(() => { fetch() }, [fetch])
+
+  const upsert = async (budget: Omit<Budget, 'id' | 'created_at' | 'updated_at'>) => {
+    const { data, error } = await supabase
+      .from('budgets')
+      .upsert(budget, { onConflict: 'category,month,year' })
+      .select()
+      .single()
+    if (error) throw error
+    setBudgets(prev => {
+      const exists = prev.find(b => b.id === data.id)
+      return exists ? prev.map(b => b.id === data.id ? data : b) : [...prev, data]
+    })
+    return data
+  }
+
+  const remove = async (id: string) => {
+    await supabase.from('budgets').delete().eq('id', id)
+    setBudgets(prev => prev.filter(b => b.id !== id))
+  }
+
+  return { budgets, loading, refetch: fetch, upsert, remove }
+}

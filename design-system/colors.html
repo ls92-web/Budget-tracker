@@ -1,0 +1,88 @@
+<!-- @dsCard group="Foundation" -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; background: #f8f9fc; padding: 32px; }
+h2 { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; margin-bottom: 16px; }
+.section { margin-bottom: 28px; }
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.swatch { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.color { width: 56px; height: 56px; border-radius: 12px; border: 1px solid rgba(0,0,0,.06); }
+.label { font-size: 10px; color: #475569; font-weight: 500; text-align: center; }
+.hex { font-size: 9px; color: #94a3b8; font-family: monospace; }
+.row { display: flex; gap: 32px; }
+.col { flex: 1; }
+</style>
+</head>
+<body>
+<div class="row">
+  <div class="col">
+    <div class="section">
+      <h2>Brand</h2>
+      <div class="swatches">
+        <div class="swatch"><div class="color" style="background:#6366f1"></div><div class="label">Accent</div><div class="hex">#6366f1</div></div>
+        <div class="swatch"><div class="color" style="background:#4f46e5"></div><div class="label">Accent Dark</div><div class="hex">#4f46e5</div></div>
+        <div class="swatch"><div class="color" style="background:#eef2ff"></div><div class="label">Accent Light</div><div class="hex">#eef2ff</div></div>
+        <div class="swatch"><div class="color" style="background:#818cf8"></div><div class="label">Accent (Dark Mode)</div><div class="hex">#818cf8</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Semantic</h2>
+      <div class="swatches">
+        <div class="swatch"><div class="color" style="background:#10b981"></div><div class="label">Success</div><div class="hex">#10b981</div></div>
+        <div class="swatch"><div class="color" style="background:#f59e0b"></div><div class="label">Warning</div><div class="hex">#f59e0b</div></div>
+        <div class="swatch"><div class="color" style="background:#ef4444"></div><div class="label">Danger</div><div class="hex">#ef4444</div></div>
+        <div class="swatch"><div class="color" style="background:#8b5cf6"></div><div class="label">Purple</div><div class="hex">#8b5cf6</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Category Colors</h2>
+      <div class="swatches">
+        <div class="swatch"><div class="color" style="background:#6366f1"></div><div class="label">Household</div></div>
+        <div class="swatch"><div class="color" style="background:#f59e0b"></div><div class="label">Transport</div></div>
+        <div class="swatch"><div class="color" style="background:#ef4444"></div><div class="label">Food</div></div>
+        <div class="swatch"><div class="color" style="background:#ec4899"></div><div class="label">Family</div></div>
+        <div class="swatch"><div class="color" style="background:#10b981"></div><div class="label">Health</div></div>
+        <div class="swatch"><div class="color" style="background:#8b5cf6"></div><div class="label">Shopping</div></div>
+        <div class="swatch"><div class="color" style="background:#14b8a6"></div><div class="label">Travel</div></div>
+        <div class="swatch"><div class="color" style="background:#22c55e"></div><div class="label">Savings</div></div>
+        <div class="swatch"><div class="color" style="background:#f97316"></div><div class="label">Bills</div></div>
+        <div class="swatch"><div class="color" style="background:#e879f9"></div><div class="label">Gifts</div></div>
+        <div class="swatch"><div class="color" style="background:#94a3b8"></div><div class="label">Misc</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="section">
+      <h2>Light Mode Surfaces</h2>
+      <div class="swatches">
+        <div class="swatch"><div class="color" style="background:#f8f9fc; border:1px solid #e2e8f0"></div><div class="label">BG Primary</div><div class="hex">#f8f9fc</div></div>
+        <div class="swatch"><div class="color" style="background:#ffffff; border:1px solid #e2e8f0"></div><div class="label">BG Secondary</div><div class="hex">#ffffff</div></div>
+        <div class="swatch"><div class="color" style="background:#f1f3f8; border:1px solid #e2e8f0"></div><div class="label">BG Tertiary</div><div class="hex">#f1f3f8</div></div>
+        <div class="swatch"><div class="color" style="background:#e2e8f0"></div><div class="label">Border</div><div class="hex">#e2e8f0</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Dark Mode Surfaces</h2>
+      <div class="swatches">
+        <div class="swatch"><div class="color" style="background:#0a0a0f"></div><div class="label">BG Primary</div><div class="hex">#0a0a0f</div></div>
+        <div class="swatch"><div class="color" style="background:#111118"></div><div class="label">BG Secondary</div><div class="hex">#111118</div></div>
+        <div class="swatch"><div class="color" style="background:#16161f"></div><div class="label">BG Tertiary</div><div class="hex">#16161f</div></div>
+        <div class="swatch"><div class="color" style="background:#1e1e2d"></div><div class="label">Border</div><div class="hex">#1e1e2d</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Text</h2>
+      <div class="swatches">
+        <div class="swatch"><div class="color" style="background:#0f172a"></div><div class="label">Primary</div><div class="hex">#0f172a</div></div>
+        <div class="swatch"><div class="color" style="background:#475569"></div><div class="label">Secondary</div><div class="hex">#475569</div></div>
+        <div class="swatch"><div class="color" style="background:#94a3b8"></div><div class="label">Muted</div><div class="hex">#94a3b8</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

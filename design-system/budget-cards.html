@@ -1,0 +1,117 @@
+<!-- @dsCard group="Dashboard" -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; -webkit-font-smoothing: antialiased; padding: 32px; background: #f8f9fc; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+.info { display: flex; align-items: center; gap: 10px; }
+.dot-icon { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.name { font-size: 13px; font-weight: 600; color: #0f172a; }
+.alert { display: flex; align-items: center; gap: 4px; font-size: 11px; margin-top: 3px; }
+.actions { display: flex; gap: 4px; }
+.icon-btn { width: 26px; height: 26px; border-radius: 8px; background: #f1f3f8; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #94a3b8; }
+.progress-track { height: 8px; background: #f1f3f8; border-radius: 999px; overflow: hidden; margin-bottom: 12px; }
+.progress-fill { height: 100%; border-radius: 999px; transition: width .6s ease; }
+.card-foot { display: flex; justify-content: space-between; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <!-- Healthy -->
+  <div class="card">
+    <div class="card-head">
+      <div class="info">
+        <div class="dot-icon" style="background:#ef444418"><div style="width:12px;height:12px;border-radius:50%;background:#ef4444"></div></div>
+        <div><div class="name">Food & Dining</div></div>
+      </div>
+      <div class="actions">
+        <button class="icon-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="icon-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>
+      </div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" style="width:55%;background:#ef4444"></div></div>
+    <div class="card-foot">
+      <span style="color:#94a3b8">Spent <strong style="color:#0f172a">$275</strong> of $500</span>
+      <span style="color:#94a3b8">Left: <strong style="color:#10b981">$225</strong></span>
+    </div>
+  </div>
+
+  <!-- Warning -->
+  <div class="card">
+    <div class="card-head">
+      <div class="info">
+        <div class="dot-icon" style="background:#f59e0b18"><div style="width:12px;height:12px;border-radius:50%;background:#f59e0b"></div></div>
+        <div>
+          <div class="name">Transportation</div>
+          <div class="alert" style="color:#f59e0b"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>80% alert</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="icon-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="icon-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>
+      </div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" style="width:85%;background:#f59e0b"></div></div>
+    <div class="card-foot">
+      <span style="color:#94a3b8">Spent <strong style="color:#0f172a">$255</strong> of $300</span>
+      <span style="color:#94a3b8">Left: <strong style="color:#f59e0b">$45</strong></span>
+    </div>
+  </div>
+
+  <!-- Over budget -->
+  <div class="card">
+    <div class="card-head">
+      <div class="info">
+        <div class="dot-icon" style="background:#8b5cf618"><div style="width:12px;height:12px;border-radius:50%;background:#8b5cf6"></div></div>
+        <div>
+          <div class="name">Shopping</div>
+          <div class="alert" style="color:#ef4444"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Over budget</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="icon-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="icon-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>
+      </div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" style="width:100%;background:#ef4444"></div></div>
+    <div class="card-foot">
+      <span style="color:#94a3b8">Spent <strong style="color:#ef4444">$380</strong> of $300</span>
+      <span style="color:#94a3b8">Over by <strong style="color:#ef4444">$80</strong></span>
+    </div>
+  </div>
+</div>
+
+<!-- Budget health score -->
+<div style="display:flex;gap:14px">
+  <div class="card" style="flex:0 0 200px;display:flex;flex-direction:column;align-items:center;gap:14px">
+    <svg viewBox="0 0 88 88" width="96" height="96" style="transform:rotate(-90deg)">
+      <circle cx="44" cy="44" r="36" fill="none" stroke="#f1f3f8" stroke-width="6"/>
+      <circle cx="44" cy="44" r="36" fill="none" stroke="#10b981" stroke-width="6" stroke-linecap="round" stroke-dasharray="180 226.2" />
+    </svg>
+    <div style="text-align:center;margin-top:-72px">
+      <div style="font-size:22px;font-weight:700;color:#10b981;font-variant-numeric:tabular-nums">80</div>
+      <div style="font-size:11px;color:#94a3b8">/ 100</div>
+    </div>
+    <div style="text-align:center;margin-top:44px">
+      <div style="font-size:13px;font-weight:600;color:#10b981">Good</div>
+      <div style="font-size:11px;color:#94a3b8">Budget Health</div>
+    </div>
+    <a style="display:block;width:100%;text-align:center;padding:8px;border-radius:12px;background:#f1f3f8;font-size:12px;font-weight:500;color:#475569;text-decoration:none">Manage Budgets</a>
+  </div>
+
+  <div class="card" style="flex:1">
+    <div style="font-size:13px;font-weight:600;color:#0f172a;margin-bottom:14px">Budget Summary</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Budgeted</div><div style="font-size:20px;font-weight:600;color:#0f172a">$1,100</div></div>
+      <div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Spent</div><div style="font-size:20px;font-weight:600;color:#0f172a">$910</div></div>
+      <div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Remaining</div><div style="font-size:20px;font-weight:600;color:#10b981">$190</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,26 +1,133 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #fff6fb;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #fdecf4;
+  --text-primary: #4a1d3a;
+  --text-secondary: #845870;
+  --text-muted: #b07f99;
+  --border: #f6d8e6;
+  --border-light: #fbe1ec;
+  --accent: #ec4899;
+  --accent-dark: #db2777;
+  --accent-deep: #9d174d;
+  --accent-light: #fde6f0;
+  --success: #db2777;
+  --warning: #e11d48;
+  --danger: #9d174d;
+  --card-shadow: 0 1px 3px 0 rgba(219,39,119,0.08);
+  --card-shadow-hover: 0 4px 16px 0 rgba(219,39,119,0.14);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --bg-primary: #1a0a12;
+  --bg-secondary: #230f1a;
+  --bg-tertiary: #2d1422;
+  --text-primary: #fce7f3;
+  --text-secondary: #f9a8d4;
+  --text-muted: #db7aaa;
+  --border: #4a1d3a;
+  --border-light: #3b1530;
+  --accent: #f472b6;
+  --accent-dark: #ec4899;
+  --accent-deep: #db2777;
+  --accent-light: #3b1530;
+  --success: #f472b6;
+  --warning: #fb7185;
+  --danger: #f43f5e;
+  --card-shadow: 0 1px 3px 0 rgba(0,0,0,0.3);
+  --card-shadow-hover: 0 4px 16px 0 rgba(0,0,0,0.4);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #f3b6d2; border-radius: 9px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: #ec4899; }
+
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-slide-in { animation: slideIn 0.3s ease forwards; }
+.animate-fade-in { animation: fadeIn 0.2s ease forwards; }
+.animate-scale-in { animation: scaleIn 0.2s ease forwards; }
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--border) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+.card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #ec4899, #db2777);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.font-display {
+  font-family: 'Quicksand', sans-serif;
+}
+
+.stagger-item { animation: slideIn 0.3s ease forwards; opacity: 0; }
+.stagger-item:nth-child(1) { animation-delay: 0ms; }
+.stagger-item:nth-child(2) { animation-delay: 50ms; }
+.stagger-item:nth-child(3) { animation-delay: 100ms; }
+.stagger-item:nth-child(4) { animation-delay: 150ms; }
+.stagger-item:nth-child(5) { animation-delay: 200ms; }
+.stagger-item:nth-child(6) { animation-delay: 250ms; }
+.stagger-item:nth-child(7) { animation-delay: 300ms; }
+.stagger-item:nth-child(8) { animation-delay: 350ms; }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.5;
+}
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }
