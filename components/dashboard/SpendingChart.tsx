@@ -42,7 +42,7 @@ export default function SpendingChart({ data }: SpendingChartProps) {
           tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
           axisLine={false}
           tickLine={false}
-          tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+          tickFormatter={(v) => `KD ${(v / 1000).toFixed(0)}k`}
         />
         <Tooltip
           contentStyle={{
