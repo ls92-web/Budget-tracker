@@ -11,6 +11,7 @@ import CategoryPieChart from '@/components/dashboard/CategoryPieChart'
 import RecentTransactions from '@/components/dashboard/RecentTransactions'
 import BudgetHealthScore from '@/components/dashboard/BudgetHealthScore'
 import { formatCurrency, getCurrentMonth, getCurrentYear, getMonthName, calculateBudgetHealth } from '@/lib/utils'
+import { useMonthlyTrend } from '@/hooks/useMonthlyTrend'
 import {
   DollarSign, TrendingDown, Wallet, Percent,
   ArrowUpRight, ChevronRight
@@ -27,19 +28,7 @@ export default function Dashboard() {
   const { budgets } = useBudgets(month, year)
   const { goals } = useSavings()
 
-  // Build spending chart data (last 6 months)
-  const chartData = useMemo(() => {
-    const months = []
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(year, month - 1 - i, 1)
-      months.push({
-        month: d.toLocaleString('en-US', { month: 'short' }),
-        income: 0,
-        expenses: 0,
-      })
-    }
-    return months
-  }, [month, year])
+  const chartData = useMonthlyTrend(6)
 
   const balance = totalIncome - totalExpenses
   const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome) * 100 : 0

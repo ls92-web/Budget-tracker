@@ -42,7 +42,7 @@ export default function SpendingChart({ data }: SpendingChartProps) {
           tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
           axisLine={false}
           tickLine={false}
-          tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+          tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
         />
         <Tooltip
           contentStyle={{
@@ -54,7 +54,7 @@ export default function SpendingChart({ data }: SpendingChartProps) {
           }}
           labelStyle={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: 4 }}
           formatter={(value, name) => [
-            `$${Number(value).toLocaleString()}`,
+            new Intl.NumberFormat('en-US', { style: 'currency', currency: 'KWD', minimumFractionDigits: 3 }).format(Number(value)),
             name === 'income' ? 'Income' : 'Expenses'
           ]}
         />
