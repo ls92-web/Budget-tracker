@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, TrendingUp, CreditCard, PieChart,
-  Target, Wallet, Sparkles, X, ChevronRight
+  Target, Wallet, X, ChevronRight
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -15,7 +15,6 @@ const NAV_ITEMS = [
   { href: '/budgets', label: 'Budgets', icon: Wallet },
   { href: '/analytics', label: 'Analytics', icon: PieChart },
   { href: '/savings', label: 'Savings Goals', icon: Target },
-  { href: '/ai', label: 'AI Assistant', icon: Sparkles },
 ]
 
 interface SidebarProps {
@@ -91,13 +90,6 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         })}
       </nav>
 
-      {/* Pro tip */}
-      <div className="mx-3 mb-3 rounded-xl p-3.5" style={{ background: 'var(--accent-light)' }}>
-        <p className="text-[10px] font-bold mb-1 tracking-widest uppercase" style={{ color: 'var(--accent)' }}>✦ Pro Tip</p>
-        <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-          Ask the AI Assistant to log expenses in plain English — try "Add $20 at Trader Joe's".
-        </p>
-      </div>
     </div>
   )
 
