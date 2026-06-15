@@ -12,7 +12,9 @@ export type Category =
   | 'Travel'
   | 'Savings & Investments'
   | 'Bills & Subscriptions'
-  | 'Gifts & Charity'
+  | 'Gifts'
+  | 'Charity'
+  | 'Coffee'
   | 'Miscellaneous'
 
 export interface IncomeEntry {

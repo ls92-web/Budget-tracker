@@ -10,6 +10,7 @@ import {
 import { formatCurrency, CATEGORY_COLORS, getCurrentMonth, getCurrentYear, getMonthName } from '@/lib/utils'
 import { Category } from '@/lib/types'
 import { TrendingDown, TrendingUp, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import CategoryIcon from '@/components/ui/CategoryIcon'
 
 export default function AnalyticsPage() {
   const [month, setMonth] = useState(getCurrentMonth())
@@ -97,7 +98,10 @@ export default function AnalyticsPage() {
               {categoryData.map(cat => (
                 <div key={cat.category}>
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span style={{ color: 'var(--text-secondary)' }}>{cat.category}</span>
+                    <span className="flex items-center gap-1.5" style={{ color: 'var(--text-secondary)' }}>
+                      <span style={{ color: cat.color }}><CategoryIcon category={cat.category} size={12} /></span>
+                      {cat.category}
+                    </span>
                     <span className="font-semibold font-mono" style={{ color: 'var(--text-primary)' }}>
                       {formatCurrency(cat.amount)}
                     </span>
@@ -189,10 +193,10 @@ export default function AnalyticsPage() {
                 <div key={e.id} className="flex items-center gap-3">
                   <span className="w-5 text-xs font-semibold text-center" style={{ color: 'var(--text-muted)' }}>{i + 1}</span>
                   <div
-                    className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-semibold flex-shrink-0"
+                    className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
                     style={{ background: `${color}18`, color }}
                   >
-                    {(e.merchant || e.category).charAt(0)}
+                    <CategoryIcon category={e.category} size={15} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">

@@ -14,6 +14,7 @@ import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { Plus, Edit2, Trash2, Wallet, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react'
 import BudgetHealthScore from '@/components/dashboard/BudgetHealthScore'
+import CategoryIcon from '@/components/ui/CategoryIcon'
 
 interface BudgetFormData {
   category: Category
@@ -162,8 +163,8 @@ export default function BudgetsPage() {
               <div key={budget.id} className="card p-5 stagger-item" style={{ animationDelay: `${i * 60}ms` }}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${color}18` }}>
-                      <div className="w-3 h-3 rounded-full" style={{ background: color }} />
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${color}18`, color }}>
+                      <CategoryIcon category={budget.category} size={17} />
                     </div>
                     <div>
                       <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{budget.category}</p>

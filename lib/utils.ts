@@ -57,8 +57,10 @@ export const CATEGORY_COLORS: Record<Category, string> = {
   'Health': '#be185d',
   'Travel': '#c026d3',
   'Family & Kids': '#f472b6',
-  'Gifts & Charity': '#e879f9',
+  'Gifts': '#e879f9',
+  'Charity': '#a78bfa',
   'Savings & Investments': '#db2777',
+  'Coffee': '#92400e',
   'Miscellaneous': '#c98aa8',
 }
 
@@ -72,7 +74,9 @@ export const CATEGORY_ICONS: Record<Category, string> = {
   'Travel': 'Plane',
   'Savings & Investments': 'TrendingUp',
   'Bills & Subscriptions': 'Receipt',
-  'Gifts & Charity': 'Gift',
+  'Gifts': 'Gift',
+  'Charity': 'Heart',
+  'Coffee': 'Coffee',
   'Miscellaneous': 'MoreHorizontal',
 }
 
@@ -86,7 +90,9 @@ export const CATEGORIES: Category[] = [
   'Travel',
   'Savings & Investments',
   'Bills & Subscriptions',
-  'Gifts & Charity',
+  'Coffee',
+  'Gifts',
+  'Charity',
   'Miscellaneous',
 ]
 
@@ -123,14 +129,16 @@ export function autoCategorize(text: string): Category {
   const rules: Array<{ keywords: string[]; category: Category }> = [
     { keywords: ['rent', 'mortgage', 'electricity', 'water', 'gas', 'internet', 'wifi', 'home', 'repair', 'maintenance', 'cleaning', 'furniture', 'appliance'], category: 'Household' },
     { keywords: ['uber', 'lyft', 'taxi', 'bus', 'train', 'subway', 'metro', 'fuel', 'gas station', 'parking', 'toll', 'car', 'auto', 'mechanic', 'oil change', 'tire'], category: 'Transportation' },
-    { keywords: ['restaurant', 'cafe', 'coffee', 'starbucks', 'mcdonalds', 'pizza', 'sushi', 'burger', 'grocery', 'supermarket', 'food', 'dining', 'lunch', 'dinner', 'breakfast', 'takeout', 'delivery', 'doordash', 'uber eats', 'grubhub'], category: 'Food & Dining' },
+    { keywords: ['coffee', 'starbucks', 'espresso', 'latte', 'cappuccino', 'dunkin', 'dutch bros', 'peet', 'blue bottle', 'cafe'], category: 'Coffee' },
+    { keywords: ['restaurant', 'mcdonalds', 'pizza', 'sushi', 'burger', 'grocery', 'supermarket', 'food', 'dining', 'lunch', 'dinner', 'breakfast', 'takeout', 'delivery', 'doordash', 'uber eats', 'grubhub'], category: 'Food & Dining' },
     { keywords: ['school', 'tuition', 'daycare', 'toys', 'children', 'kids', 'baby', 'family', 'pediatric', 'diapers', 'formula'], category: 'Family & Kids' },
     { keywords: ['doctor', 'hospital', 'pharmacy', 'medicine', 'dental', 'vision', 'health', 'medical', 'gym', 'fitness', 'therapy', 'insurance health', 'clinic', 'prescription'], category: 'Health' },
     { keywords: ['amazon', 'walmart', 'target', 'ebay', 'etsy', 'clothing', 'shoes', 'fashion', 'mall', 'store', 'shop', 'retail', 'electronics', 'apple', 'best buy'], category: 'Shopping' },
     { keywords: ['hotel', 'airbnb', 'flight', 'airline', 'vacation', 'travel', 'booking', 'expedia', 'trip', 'resort', 'cruise'], category: 'Travel' },
     { keywords: ['invest', 'stock', 'crypto', 'bitcoin', 'etf', 'mutual fund', 'retirement', '401k', 'ira', 'savings', 'brokerage', 'dividend'], category: 'Savings & Investments' },
     { keywords: ['netflix', 'spotify', 'hulu', 'disney', 'subscription', 'bill', 'phone', 'mobile', 'cable', 'streaming', 'software', 'saas', 'membership'], category: 'Bills & Subscriptions' },
-    { keywords: ['gift', 'charity', 'donation', 'church', 'nonprofit', 'birthday', 'wedding', 'present'], category: 'Gifts & Charity' },
+    { keywords: ['gift', 'birthday', 'wedding', 'present', 'wrap'], category: 'Gifts' },
+    { keywords: ['charity', 'donation', 'church', 'nonprofit', 'donate'], category: 'Charity' },
   ]
 
   for (const rule of rules) {

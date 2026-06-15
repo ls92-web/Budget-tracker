@@ -12,6 +12,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Badge from '@/components/ui/Badge'
+import CategoryIcon from '@/components/ui/CategoryIcon'
 import { Plus, Edit2, Trash2, CreditCard, ChevronLeft, ChevronRight, RefreshCw, Search, Filter } from 'lucide-react'
 
 interface ExpenseFormData {
@@ -237,10 +238,10 @@ export default function ExpensesPage() {
             return (
               <div key={entry.id} className="flex items-center gap-3 p-4 stagger-item" style={{ animationDelay: `${i * 30}ms` }}>
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-semibold"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{ background: `${color}18`, color }}
                 >
-                  {(entry.merchant || entry.category).charAt(0).toUpperCase()}
+                  <CategoryIcon category={entry.category} size={17} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">

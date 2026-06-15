@@ -172,8 +172,6 @@ export default function AIPage() {
     addMessage('user', userMsg)
     setThinking(true)
 
-    await new Promise(r => setTimeout(r, 600 + Math.random() * 400))
-
     // Check if it's a transaction entry
     const isTransaction = /(\$|\d+\.?\d*)\s*(at|from|for|@)/.test(userMsg) ||
       /add\s+\$?\d/.test(userMsg.toLowerCase()) ||
@@ -196,9 +194,39 @@ export default function AIPage() {
       } else {
         addMessage('assistant', "I couldn't extract an amount from that. Try something like: \"Add $25 at Chipotle\" or \"Spent $89.99 on Amazon yesterday\"")
       }
-    } else {
-      const answer = answerQuestion(userMsg, totalIncome, totalExpenses, categoryData, expenses)
-      addMessage('assistant', answer)
+      setThinking(false)
+      return
+    }
+
+    try {
+      const history = messages
+        .filter(m => m.id !== '0')
+        .map(m => ({ role: m.role, content: m.content }))
+      history.push({ role: 'user', content: userMsg })
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: history,
+          context: {
+            totalIncome,
+            totalExpenses,
+            categoryData,
+            budgets,
+            recentExpenses: expenses,
+          },
+        }),
+      })
+
+      const data = await res.json()
+      if (data.reply) {
+        addMessage('assistant', data.reply)
+      } else {
+        addMessage('assistant', 'Sorry, I had trouble getting a response. Please try again.')
+      }
+    } catch {
+      addMessage('assistant', 'Connection error. Please check your internet and try again.')
     }
 
     setThinking(false)
@@ -234,9 +262,9 @@ export default function AIPage() {
   ]
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-8rem)]">
+    <div className="flex flex-col lg:flex-row gap-4 lg:h-[calc(100vh-8rem)]">
       {/* Chat panel */}
-      <div className="flex-1 flex flex-col card overflow-hidden min-h-0">
+      <div className="flex-1 flex flex-col card overflow-hidden h-[70vh] lg:h-auto min-h-0">
         {/* Chat header */}
         <div className="flex items-center gap-3 px-5 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
           <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-light)' }}>

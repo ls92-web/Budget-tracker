@@ -198,11 +198,11 @@ export default function SavingsPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-bold font-mono" style={{ color: isComplete ? 'var(--success)' : 'var(--text-primary)' }}>
+                    <p className="text-xl font-bold font-mono" style={{ color: goal.color }}>
                       {pct.toFixed(0)}%
                     </p>
                     {isComplete && (
-                      <p className="text-xs font-medium" style={{ color: 'var(--success)' }}>Complete</p>
+                      <p className="text-xs font-medium" style={{ color: goal.color }}>Complete ✓</p>
                     )}
                   </div>
                 </div>
@@ -211,7 +211,7 @@ export default function SavingsPage() {
                 <div className="h-3 rounded-full overflow-hidden mb-3" style={{ background: 'var(--bg-tertiary)' }}>
                   <div
                     className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${pct}%`, background: isComplete ? 'var(--success)' : goal.color }}
+                    style={{ width: `${pct}%`, background: goal.color }}
                   />
                 </div>
 

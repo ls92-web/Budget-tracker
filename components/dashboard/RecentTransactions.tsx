@@ -2,8 +2,9 @@
 
 import { ExpenseEntry, IncomeEntry } from '@/lib/types'
 import { formatCurrency, formatShortDate, CATEGORY_COLORS } from '@/lib/utils'
-import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { Category } from '@/lib/types'
+import CategoryIcon from '@/components/ui/CategoryIcon'
 
 interface RecentTransactionsProps {
   expenses: ExpenseEntry[]
@@ -40,10 +41,10 @@ export default function RecentTransactions({ expenses, income }: RecentTransacti
           <div key={item.id} className="flex items-center gap-3 py-3 stagger-item" style={{ animationDelay: `${i * 40}ms` }}>
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: `${color}18` }}
+              style={{ background: `${color}18`, color }}
             >
               {isExpense
-                ? <ArrowDownRight size={16} style={{ color }} />
+                ? <CategoryIcon category={expenseItem!.category} size={16} />
                 : <ArrowUpRight size={16} style={{ color: '#10b981' }} />}
             </div>
             <div className="flex-1 min-w-0">
