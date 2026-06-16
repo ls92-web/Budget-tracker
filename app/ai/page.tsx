@@ -201,7 +201,7 @@ export default function LensAIPage() {
                 <Sparkles size={18} />
               </div>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#4a1d3a' }}>Budget AI</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#4a1d3a' }}>AI Budget</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#db2777' }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#db2777', display: 'inline-block', animation: 'pulse 1.5s infinite' }} />
                   Online · Ready to help
