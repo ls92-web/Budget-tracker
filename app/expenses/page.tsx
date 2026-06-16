@@ -13,8 +13,10 @@ import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Badge from '@/components/ui/Badge'
 import CategoryIcon from '@/components/ui/CategoryIcon'
-import { Plus, Edit2, Trash2, CreditCard, ChevronLeft, ChevronRight, RefreshCw, Search, Paperclip, X, ImageIcon } from 'lucide-react'
+import { Plus, Edit2, Trash2, CreditCard, ChevronLeft, ChevronRight, RefreshCw, Search, Paperclip, X, ImageIcon, Sparkles } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hydjyqlgaeerdisrkjhs.supabase.co'
 
 interface ExpenseFormData {
   amount: string
@@ -54,6 +56,8 @@ export default function ExpensesPage() {
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [coachInsight, setCoachInsight] = useState<string | null>(null)
+  const [coachLoading, setCoachLoading] = useState(false)
 
   const openAdd = () => {
     setEditing(null)
@@ -138,10 +142,36 @@ export default function ExpensesPage() {
       }
       if (editing) {
         await update(editing.id, payload)
+        setModalOpen(false)
       } else {
         await add(payload)
+        setModalOpen(false)
+        // Trigger Budget Coach for new expenses only
+        setCoachLoading(true)
+        setCoachInsight(null)
+        try {
+          const res = await fetch(`${SUPABASE_URL}/functions/v1/budget-coach`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              expense: {
+                amount: payload.amount,
+                category: payload.category,
+                merchant: payload.merchant,
+                date: payload.date,
+              },
+              month,
+              year,
+            }),
+          })
+          const data = await res.json()
+          setCoachInsight(data.insight ?? null)
+        } catch {
+          setCoachInsight(null)
+        } finally {
+          setCoachLoading(false)
+        }
       }
-      setModalOpen(false)
     } finally {
       setSaving(false)
     }
@@ -463,6 +493,68 @@ export default function ExpensesPage() {
           <Button variant="danger" className="flex-1" onClick={() => deleteId && remove(deleteId).then(() => setDeleteId(null))}>Delete</Button>
         </div>
       </Modal>
+
+      {/* Budget Coach popup */}
+      {(coachLoading || coachInsight) && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+          style={{ minWidth: '320px', maxWidth: '480px', width: 'calc(100vw - 48px)' }}
+        >
+          <div
+            className="rounded-2xl p-4 shadow-2xl"
+            style={{
+              background: 'linear-gradient(135deg, #fff0f8 0%, #fce7f3 100%)',
+              border: '1.5px solid #f9a8d4',
+              boxShadow: '0 8px 32px rgba(236,72,153,0.22)',
+            }}
+          >
+            <div className="flex items-start gap-3">
+              <div
+                className="w-9 h-9 rounded-[14px] flex items-center justify-center flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg,#ec4899,#db2777)', boxShadow: '0 4px 12px rgba(236,72,153,.4)' }}
+              >
+                <Sparkles size={17} className="text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold mb-1" style={{ color: '#db2777', fontFamily: "'Quicksand', sans-serif" }}>
+                  Budget Coach
+                </p>
+                {coachLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1">
+                      {[0, 1, 2].map(i => (
+                        <span
+                          key={i}
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{
+                            background: '#ec4899',
+                            animation: 'bounce 1.2s infinite',
+                            animationDelay: `${i * 0.2}s`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs" style={{ color: '#9d174d' }}>Analyzing your expense...</span>
+                  </div>
+                ) : (
+                  <p className="text-sm font-medium leading-snug" style={{ color: '#831843' }}>
+                    {coachInsight}
+                  </p>
+                )}
+              </div>
+              {!coachLoading && (
+                <button
+                  onClick={() => setCoachInsight(null)}
+                  className="p-1 rounded-lg hover:bg-pink-100 transition-colors flex-shrink-0"
+                  style={{ color: '#db2777' }}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
