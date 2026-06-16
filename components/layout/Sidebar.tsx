@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, TrendingUp, CreditCard, PieChart,
-  Target, Wallet, X, ChevronRight
+  Target, Wallet, X, ChevronRight, Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { href: '/budgets', label: 'Budgets', icon: Wallet },
   { href: '/analytics', label: 'Analytics', icon: PieChart },
   { href: '/savings', label: 'Savings Goals', icon: Target },
+  { href: '/ai', label: 'AI Assistant', icon: Sparkles },
 ]
 
 interface SidebarProps {
