@@ -13,7 +13,8 @@ import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Badge from '@/components/ui/Badge'
 import CategoryIcon from '@/components/ui/CategoryIcon'
-import { Plus, Edit2, Trash2, CreditCard, ChevronLeft, ChevronRight, RefreshCw, Search, Filter } from 'lucide-react'
+import { Plus, Edit2, Trash2, CreditCard, ChevronLeft, ChevronRight, RefreshCw, Search, Paperclip, X, ImageIcon } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 interface ExpenseFormData {
   amount: string
@@ -24,6 +25,7 @@ interface ExpenseFormData {
   notes: string
   is_recurring: boolean
   recurring_interval: RecurringInterval
+  receipt_image_url: string
 }
 
 const DEFAULT_FORM: ExpenseFormData = {
@@ -35,6 +37,7 @@ const DEFAULT_FORM: ExpenseFormData = {
   notes: '',
   is_recurring: false,
   recurring_interval: 'monthly',
+  receipt_image_url: '',
 }
 
 export default function ExpensesPage() {
@@ -47,12 +50,16 @@ export default function ExpensesPage() {
   const [form, setForm] = useState<ExpenseFormData>(DEFAULT_FORM)
   const [saving, setSaving] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [receiptFile, setReceiptFile] = useState<File | null>(null)
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [filterCategory, setFilterCategory] = useState<string>('all')
 
   const openAdd = () => {
     setEditing(null)
     setForm(DEFAULT_FORM)
+    setReceiptFile(null)
+    setReceiptPreview(null)
     setModalOpen(true)
   }
 
@@ -67,8 +74,28 @@ export default function ExpensesPage() {
       notes: entry.notes || '',
       is_recurring: entry.is_recurring,
       recurring_interval: entry.recurring_interval || 'monthly',
+      receipt_image_url: entry.receipt_image_url || '',
     })
+    setReceiptFile(null)
+    setReceiptPreview(entry.receipt_image_url || null)
     setModalOpen(true)
+  }
+
+  const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setReceiptFile(file)
+    if (file.type.startsWith('image/')) {
+      setReceiptPreview(URL.createObjectURL(file))
+    } else {
+      setReceiptPreview(null)
+    }
+  }
+
+  const clearReceipt = () => {
+    setReceiptFile(null)
+    setReceiptPreview(null)
+    setForm(f => ({ ...f, receipt_image_url: '' }))
   }
 
   const handleMerchantChange = (val: string) => {
@@ -83,6 +110,21 @@ export default function ExpensesPage() {
     if (!form.amount) return
     setSaving(true)
     try {
+      let receiptUrl = form.receipt_image_url || undefined
+
+      // Upload new receipt file if selected
+      if (receiptFile) {
+        const ext = receiptFile.name.split('.').pop()
+        const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+        const { error: uploadError } = await supabase.storage
+          .from('receipt-attach')
+          .upload(path, receiptFile, { upsert: false })
+        if (!uploadError) {
+          const { data } = supabase.storage.from('receipt-attach').getPublicUrl(path)
+          receiptUrl = data.publicUrl
+        }
+      }
+
       const payload = {
         amount: parseFloat(form.amount),
         category: form.category,
@@ -92,6 +134,7 @@ export default function ExpensesPage() {
         notes: form.notes || undefined,
         is_recurring: form.is_recurring,
         recurring_interval: form.is_recurring ? form.recurring_interval : undefined,
+        receipt_image_url: receiptUrl,
       }
       if (editing) {
         await update(editing.id, payload)
@@ -261,6 +304,18 @@ export default function ExpensesPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  {entry.receipt_image_url && (
+                    <a
+                      href={entry.receipt_image_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="View receipt"
+                      className="p-1.5 rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors"
+                      style={{ color: 'var(--accent)' }}
+                    >
+                      <Paperclip size={13} />
+                    </a>
+                  )}
                   <span className="text-base font-semibold font-mono" style={{ color: 'var(--text-primary)' }}>
                     -{formatCurrency(Number(entry.amount))}
                   </span>
@@ -326,6 +381,49 @@ export default function ExpensesPage() {
             value={form.notes}
             onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
           />
+
+          {/* Receipt upload */}
+          <div>
+            <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Receipt (optional)</p>
+            {receiptPreview ? (
+              <div className="relative inline-flex items-center gap-3 p-3 rounded-xl border" style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border)' }}>
+                {receiptPreview.startsWith('blob:') || receiptPreview.match(/\.(jpg|jpeg|png|webp|heic)/i) ? (
+                  <img src={receiptPreview} alt="Receipt" className="w-16 h-16 object-cover rounded-lg" />
+                ) : (
+                  <div className="w-16 h-16 rounded-lg flex items-center justify-center" style={{ background: 'var(--bg-secondary)' }}>
+                    <ImageIcon size={24} style={{ color: 'var(--text-muted)' }} />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                    {receiptFile ? receiptFile.name : 'Existing receipt'}
+                  </p>
+                  {receiptFile && (
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                      {(receiptFile.size / 1024).toFixed(0)} KB
+                    </p>
+                  )}
+                </div>
+                <button onClick={clearReceipt} className="p-1 rounded-lg hover:bg-[var(--bg-secondary)] transition-colors flex-shrink-0" style={{ color: 'var(--text-muted)' }}>
+                  <X size={14} />
+                </button>
+              </div>
+            ) : (
+              <label
+                className="flex items-center justify-center gap-2 w-full py-4 rounded-xl border-2 border-dashed cursor-pointer transition-colors hover:border-pink-300"
+                style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+              >
+                <Paperclip size={15} />
+                <span className="text-sm">Attach receipt image or PDF</span>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
+                  className="hidden"
+                  onChange={handleReceiptChange}
+                />
+              </label>
+            )}
+          </div>
           <div>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
