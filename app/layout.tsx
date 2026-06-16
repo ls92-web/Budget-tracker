@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import AppShell from '@/components/layout/AppShell'
 
 export const metadata: Metadata = {
-  title: 'Money Lens - Personal Finance',
+  title: 'Budgetly - Personal Finance',
   description: 'Premium personal finance and budget tracking',
 }
 

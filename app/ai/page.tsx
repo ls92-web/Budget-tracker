@@ -14,19 +14,18 @@ interface Message {
 
 const WELCOME: Message = {
   role: 'ai',
-  text: "Hi there! I'm Lens AI, your Money Lens assistant.\n\nAsk me about your spending, or log an expense in plain English — try \"Add KD 45 at Starbucks\".",
+  text: "Hi there! I'm AI Budget, your Budgetly assistant.\n\nAsk me about your spending, or log an expense in plain English — try \"Add KD 45 at Starbucks\".",
 }
 
 const CHIPS = ['How much did I spend?', 'Biggest category?', 'Savings rate?', 'Give me a tip']
 const EXAMPLES = ['Add KD 12.5 at Starbucks', 'Spent KD 85 on groceries', 'Paid KD 150 for electricity']
 
-function MoneyLensIcon({ size = 21 }: { size?: number }) {
+function BudgetlyIcon({ size = 21 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="10" cy="10" r="7.5" />
-      <line x1="15.6" y1="15.6" x2="21.5" y2="21.5" />
-      <line x1="10" y1="6" x2="10" y2="14" />
-      <path d="M12.4 7.9c-.6-.6-1.5-1-2.5-1-1.4 0-2.4.7-2.4 1.8 0 2.4 5 1.2 5 3.6 0 1.1-1.1 1.8-2.6 1.8-1 0-2-.4-2.6-1" />
+      <path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="16" y1="16" x2="19" y2="16" strokeWidth="2.5" />
     </svg>
   )
 }
@@ -169,11 +168,11 @@ export default function LensAIPage() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: '#fff', boxShadow: '0 5px 14px rgba(236,72,153,.4)', flexShrink: 0,
           }}>
-            <MoneyLensIcon size={21} />
+            <BudgetlyIcon size={21} />
           </div>
           <div>
             <div style={{ fontFamily: "'Quicksand',sans-serif", fontSize: 21, fontWeight: 700, color: '#4a1d3a', letterSpacing: '-.01em' }}>
-              Lens AI
+              AI Budget
             </div>
             <div style={{ fontSize: 12, color: '#b07f99', marginTop: 2 }}>Ask anything about your money</div>
           </div>

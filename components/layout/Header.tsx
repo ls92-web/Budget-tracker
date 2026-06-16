@@ -11,13 +11,13 @@ const PAGE_TITLES: Record<string, [string, string]> = {
   '/budgets': ['Budgets', 'Track spending against your limits'],
   '/analytics': ['Analytics', 'Spending trends & insights'],
   '/savings': ['Savings Goals', 'Track your goals'],
-  '/ai': ['Lens AI', 'Ask anything about your money'],
+  '/ai': ['AI Budget', 'Ask anything about your money'],
 }
 
 export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const { theme, toggleTheme } = useTheme()
   const pathname = usePathname()
-  const [title, subtitle] = PAGE_TITLES[pathname] || ['Money Lens', '']
+  const [title, subtitle] = PAGE_TITLES[pathname] || ['Budgetly', '']
 
   return (
     <header

@@ -13,8 +13,8 @@ export async function POST(request: NextRequest) {
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://money-lens.vercel.app',
-      'X-Title': 'Money Lens',
+      'HTTP-Referer': 'https://budgetly.vercel.app',
+      'X-Title': 'Budgetly',
     },
     body: JSON.stringify({
       model: 'openai/gpt-oss-120b:free',
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: `You are a friendly personal finance assistant built into Money Lens, a budgeting app for Kuwait.
+          content: `You are a friendly personal finance assistant built into Budgetly, a budgeting app for Kuwait.
 Help users understand their spending, improve budgets, reach savings goals, and make smarter financial decisions.
 Currency is KWD (Kuwaiti Dinar) with 3 decimal places. Keep answers concise and actionable.
 Do not give investment advice. You can help with budgeting, saving, spending habits, and financial planning.`,

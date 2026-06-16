@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   { href: '/budgets', label: 'Budgets', icon: Wallet },
   { href: '/analytics', label: 'Analytics', icon: PieChart },
   { href: '/savings', label: 'Savings Goals', icon: Target },
-  { href: '/ai', label: 'AI Lens', icon: Sparkles },
+  { href: '/ai', label: 'AI Budget', icon: Sparkles },
 ]
 
 interface SidebarProps {
@@ -23,13 +23,15 @@ interface SidebarProps {
   onClose: () => void
 }
 
-function MoneyLensLogo({ size = 22 }: { size?: number }) {
+function BudgetlyLogo({ size = 22 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="10" cy="10" r="7.5" />
-      <line x1="15.6" y1="15.6" x2="21.5" y2="21.5" />
-      <line x1="10" y1="6" x2="10" y2="14" />
-      <path d="M12.4 7.9c-.6-.6-1.5-1-2.5-1-1.4 0-2.4.7-2.4 1.8 0 2.4 5 1.2 5 3.6 0 1.1-1.1 1.8-2.6 1.8-1 0-2-.4-2.6-1" />
+      {/* Wallet body */}
+      <path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z" />
+      {/* Divider */}
+      <line x1="3" y1="12" x2="21" y2="12" />
+      {/* Coin slot */}
+      <line x1="16" y1="16" x2="19" y2="16" strokeWidth="2.5" />
     </svg>
   )
 }
@@ -46,13 +48,13 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             className="w-9 h-9 rounded-[14px] flex items-center justify-center text-white flex-shrink-0"
             style={{ background: 'linear-gradient(135deg,#ec4899,#db2777)', boxShadow: '0 5px 14px rgba(236,72,153,.4)' }}
           >
-            <MoneyLensLogo size={21} />
+            <BudgetlyLogo size={21} />
           </div>
           <span
             className="text-xl font-bold tracking-tight whitespace-nowrap"
             style={{ fontFamily: "'Quicksand', sans-serif", background: 'linear-gradient(135deg,#ec4899,#db2777)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
           >
-            Money Lens
+            Budgetly
           </span>
         </div>
         <button
