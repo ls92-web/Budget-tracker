@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   { href: '/budgets', label: 'Budgets', icon: Wallet },
   { href: '/analytics', label: 'Analytics', icon: PieChart },
   { href: '/savings', label: 'Savings Goals', icon: Target },
-  { href: '/ai', label: 'AI Assistant', icon: Sparkles },
+  { href: '/ai', label: 'AI Lens', icon: Sparkles },
 ]
 
 interface SidebarProps {
