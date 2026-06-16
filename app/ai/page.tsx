@@ -153,33 +153,14 @@ export default function LensAIPage() {
         .ai-example:hover { background: #fde6f0 !important; }
         @media (max-width:820px) {
           .ai-wrap { flex-direction: column !important; }
-          .ai-main { height: 64vh !important; flex: none !important; }
-          .ai-side { width: 100% !important; }
+          .ai-side { width: 100% !important; overflow-y: visible !important; }
         }
       `}</style>
 
-      <div style={{ fontFamily: "'Nunito', sans-serif", display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ fontFamily: "'Nunito', sans-serif", display: 'flex', flexDirection: 'column', height: '100%' }}>
 
-        {/* Page header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 14,
-            background: 'linear-gradient(135deg,#ec4899,#f472b6)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', boxShadow: '0 5px 14px rgba(236,72,153,.4)', flexShrink: 0,
-          }}>
-            <BudgetlyIcon size={21} />
-          </div>
-          <div>
-            <div style={{ fontFamily: "'Quicksand',sans-serif", fontSize: 21, fontWeight: 700, color: '#4a1d3a', letterSpacing: '-.01em' }}>
-              AI Budget
-            </div>
-            <div style={{ fontSize: 12, color: '#b07f99', marginTop: 2 }}>Ask anything about your money</div>
-          </div>
-        </div>
-
-        {/* Main area */}
-        <div className="ai-wrap" style={{ display: 'flex', gap: 16, height: '74vh' }}>
+        {/* Main area — fills full container height */}
+        <div className="ai-wrap" style={{ display: 'flex', gap: 16, flex: 1, minHeight: 0 }}>
 
           {/* Chat column */}
           <div className="ai-main" style={{
@@ -301,7 +282,7 @@ export default function LensAIPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="ai-side" style={{ width: 250, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="ai-side" style={{ width: 250, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto' }}>
 
             {/* Spending Insights */}
             <div style={{ background: '#fff', border: '1px solid #f6d8e6', borderRadius: 14, padding: 16, boxShadow: '0 1px 3px rgba(219,39,119,.08)' }}>
@@ -373,3 +354,4 @@ export default function LensAIPage() {
     </>
   )
 }
+
