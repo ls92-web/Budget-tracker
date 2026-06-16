@@ -1,224 +1,376 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { Send, Sparkles, Bot, User } from 'lucide-react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { Sparkles, Send, User, AlertTriangle, Check } from 'lucide-react'
+import { useIncome } from '@/hooks/useIncome'
+import { useExpenses } from '@/hooks/useExpenses'
+import { getCurrentMonth, getCurrentYear, formatCurrency } from '@/lib/utils'
+import { Category } from '@/lib/types'
 
 interface Message {
-  role: 'user' | 'assistant'
-  content: string
+  role: 'ai' | 'user'
+  text: string
 }
 
-const SUGGESTIONS = [
-  'How can I reduce my food spending?',
-  'Am I saving enough each month?',
-  'Tips for sticking to a budget',
-  'How to build an emergency fund?',
-]
+const WELCOME: Message = {
+  role: 'ai',
+  text: "Hi there! I'm Lens AI, your Money Lens assistant.\n\nAsk me about your spending, or log an expense in plain English — try \"Add KD 45 at Starbucks\".",
+}
 
-export default function AIPage() {
-  const [messages, setMessages] = useState<Message[]>([])
+const CHIPS = ['How much did I spend?', 'Biggest category?', 'Savings rate?', 'Give me a tip']
+const EXAMPLES = ['Add KD 12.5 at Starbucks', 'Spent KD 85 on groceries', 'Paid KD 150 for electricity']
+
+function MoneyLensIcon({ size = 21 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="10" cy="10" r="7.5" />
+      <line x1="15.6" y1="15.6" x2="21.5" y2="21.5" />
+      <line x1="10" y1="6" x2="10" y2="14" />
+      <path d="M12.4 7.9c-.6-.6-1.5-1-2.5-1-1.4 0-2.4.7-2.4 1.8 0 2.4 5 1.2 5 3.6 0 1.1-1.1 1.8-2.6 1.8-1 0-2-.4-2.6-1" />
+    </svg>
+  )
+}
+
+function guessCat(text: string): Category {
+  const t = text.toLowerCase()
+  if (/coffee|starbucks|caribou|costa|cafe|latte|espresso/.test(t)) return 'Coffee'
+  if (/restaurant|food|lunch|dinner|grocer|pizza|mcdonald|burger|sushi/.test(t)) return 'Food & Dining'
+  if (/uber|lyft|gas|fuel|transport|train|bus|parking|taxi|careem/.test(t)) return 'Transportation'
+  if (/amazon|target|store|shop|clothes|mall|avenues|ikea/.test(t)) return 'Shopping'
+  if (/netflix|spotify|bill|subscription|electric|internet|phone|utility/.test(t)) return 'Bills & Subscriptions'
+  if (/gym|pharmacy|doctor|health|medical|dentist/.test(t)) return 'Health'
+  if (/gift|birthday|present/.test(t)) return 'Gifts'
+  if (/charity|donate|donation/.test(t)) return 'Charity'
+  return 'Miscellaneous'
+}
+
+function parseAmount(text: string): number | null {
+  const m = text.match(/(?:KWD|KD|\$)?\s*(\d+(?:[.,]\d{1,3})?)/i)
+  return m ? parseFloat(m[1].replace(',', '.')) : null
+}
+
+export default function LensAIPage() {
+  const month = getCurrentMonth()
+  const year = getCurrentYear()
+  const { total: totalIncome } = useIncome(month, year)
+  const { total: totalExpenses, categoryData, add: addExpense } = useExpenses(month, year)
+
+  const [messages, setMessages] = useState<Message[]>([WELCOME])
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const chatRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const net = totalIncome - totalExpenses
+  const savingsRate = totalIncome > 0 ? ((net / totalIncome) * 100).toFixed(1) : '0.0'
+  const topCat = categoryData[0]
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight
   }, [messages])
 
-  async function send(text: string) {
-    const userMsg: Message = { role: 'user', content: text }
-    const next = [...messages, userMsg]
-    setMessages(next)
+  const send = useCallback(async (text: string) => {
+    const trimmed = text.trim()
+    if (!trimmed || streaming) return
+
+    const userMsg: Message = { role: 'user', text: trimmed }
+    const history = [...messages, userMsg]
+    setMessages(history)
     setInput('')
     setStreaming(true)
+    setMessages(prev => [...prev, { role: 'ai', text: '' }])
 
-    // Add an empty assistant message we'll fill in
-    setMessages(prev => [...prev, { role: 'assistant', content: '' }])
+    // Client-side expense logging intent
+    const isExpense = /(add|spent|paid|bought|log)/i.test(trimmed)
+    const amount = parseAmount(trimmed)
+    if (isExpense && amount !== null) {
+      const cat = guessCat(trimmed)
+      const atMatch = trimmed.match(/(?:at|on|for|from)\s+([A-Za-z][\w'&\s]{1,24})/i)
+      const merchant = atMatch ? atMatch[1].trim() : cat
+      try {
+        await addExpense({
+          amount,
+          category: cat,
+          merchant,
+          payment_method: 'card',
+          date: new Date().toISOString().split('T')[0],
+          is_recurring: false,
+          notes: trimmed,
+        })
+      } catch { /* non-blocking */ }
+    }
 
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: next }),
+        body: JSON.stringify({
+          messages: history.map(m => ({
+            role: m.role === 'ai' ? 'assistant' : 'user',
+            content: m.text,
+          })),
+        }),
       })
 
       if (!res.ok || !res.body) {
-        const err = await res.json().catch(() => ({ error: 'Request failed' }))
         setMessages(prev => [
           ...prev.slice(0, -1),
-          { role: 'assistant', content: `Sorry, something went wrong: ${err.error ?? 'unknown error'}` },
+          { role: 'ai', text: "Sorry, I couldn't connect right now. Please try again." },
         ])
         return
       }
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
-      let assistantText = ''
+      let aiText = ''
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-
-        const chunk = decoder.decode(value, { stream: true })
-        const lines = chunk.split('\n')
-
-        for (const line of lines) {
+        for (const line of decoder.decode(value, { stream: true }).split('\n')) {
           if (!line.startsWith('data: ')) continue
           const data = line.slice(6).trim()
           if (data === '[DONE]') break
           try {
-            const json = JSON.parse(data)
-            const delta = json.choices?.[0]?.delta?.content ?? ''
-            assistantText += delta
-            setMessages(prev => [
-              ...prev.slice(0, -1),
-              { role: 'assistant', content: assistantText },
-            ])
-          } catch {
-            // skip malformed chunks
-          }
+            const delta = JSON.parse(data).choices?.[0]?.delta?.content ?? ''
+            aiText += delta
+            setMessages(prev => [...prev.slice(0, -1), { role: 'ai', text: aiText }])
+          } catch { /* skip */ }
         }
       }
     } finally {
       setStreaming(false)
-      textareaRef.current?.focus()
+      inputRef.current?.focus()
     }
-  }
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const text = input.trim()
-    if (!text || streaming) return
-    send(text)
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSubmit(e as unknown as React.FormEvent)
-    }
-  }
+  }, [messages, streaming, addExpense])
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-4rem)] max-w-3xl mx-auto">
-      {/* Messages area */}
-      <div className="flex-1 overflow-y-auto py-4 space-y-4">
-        {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full gap-6 text-center px-4">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg,#ec4899,#db2777)', boxShadow: '0 8px 24px rgba(236,72,153,.35)' }}
-            >
-              <Sparkles size={28} className="text-white" />
+    <>
+      <style>{`
+        @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+        .ai-msg { animation: fadeUp .25s ease; }
+        .ai-chip:hover { background: #f6d8e6 !important; }
+        .ai-example:hover { background: #fde6f0 !important; }
+        @media (max-width:820px) {
+          .ai-wrap { flex-direction: column !important; }
+          .ai-main { height: 64vh !important; flex: none !important; }
+          .ai-side { width: 100% !important; }
+        }
+      `}</style>
+
+      <div style={{ fontFamily: "'Nunito', sans-serif", display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+        {/* Page header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: 14,
+            background: 'linear-gradient(135deg,#ec4899,#f472b6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', boxShadow: '0 5px 14px rgba(236,72,153,.4)', flexShrink: 0,
+          }}>
+            <MoneyLensIcon size={21} />
+          </div>
+          <div>
+            <div style={{ fontFamily: "'Quicksand',sans-serif", fontSize: 21, fontWeight: 700, color: '#4a1d3a', letterSpacing: '-.01em' }}>
+              Lens AI
             </div>
-            <div>
-              <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
-                Money Lens AI
-              </h2>
-              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                Ask me anything about your budget, spending, or savings goals.
-              </p>
+            <div style={{ fontSize: 12, color: '#b07f99', marginTop: 2 }}>Ask anything about your money</div>
+          </div>
+        </div>
+
+        {/* Main area */}
+        <div className="ai-wrap" style={{ display: 'flex', gap: 16, height: '74vh' }}>
+
+          {/* Chat column */}
+          <div className="ai-main" style={{
+            flex: 1,
+            background: '#fff',
+            border: '1px solid #f6d8e6',
+            borderRadius: 16,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            boxShadow: '0 1px 3px rgba(219,39,119,.08)',
+          }}>
+            {/* Chat header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '15px 20px', borderBottom: '1px solid #f6d8e6' }}>
+              <div style={{
+                width: 38, height: 38, borderRadius: 12, background: '#fde6f0',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ec4899', flexShrink: 0,
+              }}>
+                <Sparkles size={18} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#4a1d3a' }}>Lens AI</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#db2777' }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#db2777', display: 'inline-block', animation: 'pulse 1.5s infinite' }} />
+                  Online · Ready to help
+                </div>
+              </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-md">
-              {SUGGESTIONS.map(s => (
+
+            {/* Messages */}
+            <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', padding: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {messages.map((m, i) => {
+                const isUser = m.role === 'user'
+                return (
+                  <div key={i} className="ai-msg" style={{ display: 'flex', gap: 10, flexDirection: isUser ? 'row-reverse' : 'row' }}>
+                    <div style={{
+                      width: 30, height: 30, borderRadius: 10, flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: isUser ? '#fdecf4' : '#fde6f0',
+                      color: isUser ? '#845870' : '#ec4899',
+                    }}>
+                      {isUser ? <User size={14} /> : <Sparkles size={14} />}
+                    </div>
+                    <div style={{
+                      maxWidth: '78%', padding: '10px 14px', borderRadius: 16,
+                      fontSize: 13, lineHeight: 1.5, whiteSpace: 'pre-line',
+                      background: isUser ? '#ec4899' : '#fdecf4',
+                      color: isUser ? '#fff' : '#4a1d3a',
+                    }}>
+                      {m.text || (
+                        <span style={{ display: 'flex', gap: 4, alignItems: 'center', height: 16 }}>
+                          {[0, 150, 300].map(delay => (
+                            <span key={delay} style={{
+                              width: 5, height: 5, borderRadius: '50%', background: '#ec4899',
+                              display: 'inline-block', animation: `pulse 1s ${delay}ms infinite`,
+                            }} />
+                          ))}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Quick-reply chips */}
+            <div style={{ display: 'flex', gap: 7, padding: '10px 16px', overflowX: 'auto', borderTop: '1px solid #fbe1ec' }}>
+              {CHIPS.map(chip => (
                 <button
-                  key={s}
-                  onClick={() => send(s)}
-                  className="text-left px-4 py-3 rounded-xl text-sm border transition-colors hover:border-pink-400"
+                  key={chip}
+                  className="ai-chip"
+                  onClick={() => send(chip)}
+                  disabled={streaming}
                   style={{
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border)',
-                    color: 'var(--text-secondary)',
+                    padding: '7px 13px', borderRadius: 10, fontSize: 11,
+                    background: '#fdecf4', color: '#845870', border: '1px solid #f6d8e6',
+                    whiteSpace: 'nowrap', cursor: 'pointer', flexShrink: 0,
+                    fontFamily: 'inherit', transition: 'background .15s',
                   }}
                 >
-                  {s}
+                  {chip}
                 </button>
               ))}
             </div>
-          </div>
-        ) : (
-          messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-            >
-              {/* Avatar */}
-              <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-                style={
-                  msg.role === 'assistant'
-                    ? { background: 'linear-gradient(135deg,#ec4899,#db2777)' }
-                    : { background: 'var(--bg-tertiary)' }
-                }
-              >
-                {msg.role === 'assistant'
-                  ? <Bot size={15} className="text-white" />
-                  : <User size={15} style={{ color: 'var(--text-secondary)' }} />
-                }
-              </div>
 
-              {/* Bubble */}
-              <div
-                className="max-w-[78%] px-4 py-3 rounded-2xl text-sm leading-relaxed"
-                style={
-                  msg.role === 'user'
-                    ? {
-                        background: 'linear-gradient(135deg,#ec4899,#db2777)',
-                        color: '#fff',
-                        borderBottomRightRadius: '4px',
-                      }
-                    : {
-                        background: 'var(--bg-secondary)',
-                        border: '1px solid var(--border)',
-                        color: 'var(--text-primary)',
-                        borderBottomLeftRadius: '4px',
-                      }
-                }
+            {/* Composer */}
+            <div style={{ display: 'flex', gap: 8, padding: '14px 16px', borderTop: '1px solid #f6d8e6' }}>
+              <input
+                ref={inputRef}
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') send(input) }}
+                disabled={streaming}
+                placeholder='Ask a question or say "Add KD 50 at Whole Foods"'
+                style={{
+                  flex: 1, padding: '10px 14px', borderRadius: 12,
+                  border: '1px solid #f6d8e6', background: '#fdecf4',
+                  fontSize: 13, color: '#4a1d3a', outline: 'none',
+                  fontFamily: 'inherit',
+                }}
+              />
+              <button
+                onClick={() => send(input)}
+                disabled={!input.trim() || streaming}
+                style={{
+                  padding: '10px 18px', borderRadius: 999,
+                  background: 'linear-gradient(135deg,#ec4899,#db2777)',
+                  color: '#fff', border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  fontSize: 12, fontWeight: 700, fontFamily: 'inherit',
+                  boxShadow: '0 4px 12px rgba(236,72,153,.38)',
+                  opacity: !input.trim() || streaming ? 0.5 : 1,
+                  transition: 'opacity .15s',
+                }}
               >
-                {msg.content || (
-                  <span className="flex gap-1 items-center h-4">
-                    <span className="w-1.5 h-1.5 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </span>
-                )}
+                <Send size={14} /> Send
+              </button>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="ai-side" style={{ width: 250, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+            {/* Spending Insights */}
+            <div style={{ background: '#fff', border: '1px solid #f6d8e6', borderRadius: 14, padding: 16, boxShadow: '0 1px 3px rgba(219,39,119,.08)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#4a1d3a', marginBottom: 12 }}>
+                <AlertTriangle size={14} style={{ color: '#e11d48', flexShrink: 0 }} />
+                Spending Insights
+              </div>
+              <div style={{ display: 'flex', gap: 8, padding: '9px 11px', background: '#fff6fb', borderRadius: 10, marginBottom: 7, fontSize: 11, lineHeight: 1.45, color: '#845870' }}>
+                <AlertTriangle size={12} style={{ color: '#e11d48', flexShrink: 0, marginTop: 1 }} />
+                {topCat
+                  ? `${topCat.category} is ${topCat.percentage.toFixed(0)}% of spending — your largest category this month.`
+                  : 'No spending data yet for this month.'}
+              </div>
+              <div style={{ display: 'flex', gap: 8, padding: '9px 11px', background: '#fff6fb', borderRadius: 10, fontSize: 11, lineHeight: 1.45, color: '#845870' }}>
+                <Check size={12} style={{ color: '#db2777', flexShrink: 0, marginTop: 1 }} />
+                {parseFloat(savingsRate) >= 20
+                  ? `Excellent savings rate of ${savingsRate}% — well above the 20% target.`
+                  : `Your savings rate is ${savingsRate}% — try to reach the 20% target.`}
               </div>
             </div>
-          ))
-        )}
-        <div ref={bottomRef} />
-      </div>
 
-      {/* Input bar */}
-      <form
-        onSubmit={handleSubmit}
-        className="flex items-end gap-2 p-3 rounded-2xl border"
-        style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-      >
-        <textarea
-          ref={textareaRef}
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask about your finances…"
-          rows={1}
-          disabled={streaming}
-          className="flex-1 resize-none bg-transparent text-sm outline-none leading-relaxed py-1"
-          style={{ color: 'var(--text-primary)', maxHeight: '120px' }}
-        />
-        <button
-          type="submit"
-          disabled={!input.trim() || streaming}
-          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-opacity disabled:opacity-40"
-          style={{ background: 'linear-gradient(135deg,#ec4899,#db2777)' }}
-        >
-          <Send size={15} className="text-white" />
-        </button>
-      </form>
-      <p className="text-center text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
-        AI can make mistakes — always verify important financial decisions.
-      </p>
-    </div>
+            {/* This Month */}
+            <div style={{ background: '#fff', border: '1px solid #f6d8e6', borderRadius: 14, padding: 16, boxShadow: '0 1px 3px rgba(219,39,119,.08)' }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#4a1d3a', marginBottom: 10 }}>This Month</div>
+              {[
+                { label: 'Income', value: formatCurrency(totalIncome), color: '#db2777' },
+                { label: 'Expenses', value: formatCurrency(totalExpenses), color: '#9d174d' },
+                { label: 'Balance', value: formatCurrency(net), color: '#ec4899' },
+              ].map((row, i, arr) => (
+                <div
+                  key={row.label}
+                  style={{
+                    display: 'flex', justifyContent: 'space-between',
+                    fontSize: 11, padding: '6px 0',
+                    borderBottom: i < arr.length - 1 ? '1px solid #fbe1ec' : 'none',
+                  }}
+                >
+                  <span style={{ color: '#b07f99' }}>{row.label}</span>
+                  <span style={{ color: row.color, fontWeight: 600 }}>{row.value}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Try Asking */}
+            <div style={{ background: '#fff', border: '1px solid #f6d8e6', borderRadius: 14, padding: 16, boxShadow: '0 1px 3px rgba(219,39,119,.08)' }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#4a1d3a', marginBottom: 10 }}>Try Asking</div>
+              {EXAMPLES.map(ex => (
+                <button
+                  key={ex}
+                  className="ai-example"
+                  onClick={() => send(ex)}
+                  disabled={streaming}
+                  style={{
+                    display: 'block', width: '100%', textAlign: 'left',
+                    padding: '8px 11px', borderRadius: 9, background: '#fff6fb',
+                    fontSize: 11, color: '#ec4899', fontStyle: 'italic',
+                    border: 'none', cursor: 'pointer', marginBottom: 6,
+                    fontFamily: 'inherit', transition: 'background .15s',
+                  }}
+                >
+                  &ldquo;{ex}&rdquo;
+                </button>
+              ))}
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </>
   )
 }

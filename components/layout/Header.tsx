@@ -11,7 +11,7 @@ const PAGE_TITLES: Record<string, [string, string]> = {
   '/budgets': ['Budgets', 'Track spending against your limits'],
   '/analytics': ['Analytics', 'Spending trends & insights'],
   '/savings': ['Savings Goals', 'Track your goals'],
-  '/ai': ['AI Assistant', 'Your personal finance assistant'],
+  '/ai': ['Lens AI', 'Ask anything about your money'],
 }
 
 export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
