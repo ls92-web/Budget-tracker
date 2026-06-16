@@ -9,12 +9,12 @@ import {
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/income', label: 'Income', icon: TrendingUp },
-  { href: '/expenses', label: 'Expenses', icon: CreditCard },
-  { href: '/budgets', label: 'Budgets', icon: Wallet },
-  { href: '/analytics', label: 'Analytics', icon: PieChart },
-  { href: '/savings', label: 'Savings Goals', icon: Target },
+  { href: '/', label: 'My Money', icon: LayoutDashboard },
+  { href: '/income', label: 'Money In', icon: TrendingUp },
+  { href: '/expenses', label: 'Spending', icon: CreditCard },
+  { href: '/budgets', label: 'My Limits', icon: Wallet },
+  { href: '/analytics', label: 'The Breakdown', icon: PieChart },
+  { href: '/savings', label: 'Goals', icon: Target },
   { href: '/ai', label: 'AI Budget', icon: Sparkles },
 ]
 
