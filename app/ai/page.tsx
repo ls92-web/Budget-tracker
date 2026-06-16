@@ -92,7 +92,7 @@ export default function LensAIPage() {
           amount,
           category: cat,
           merchant,
-          payment_method: 'card',
+          payment_method: 'other',
           date: new Date().toISOString().split('T')[0],
           is_recurring: false,
           notes: trimmed,
