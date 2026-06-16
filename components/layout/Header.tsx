@@ -5,13 +5,13 @@ import { useTheme } from '@/components/providers/ThemeProvider'
 import { usePathname } from 'next/navigation'
 
 const PAGE_TITLES: Record<string, [string, string]> = {
-  '/': ['Dashboard', 'Your financial overview · June 2026'],
-  '/income': ['Income', 'Track your earnings'],
-  '/expenses': ['Expenses', 'Track your spending'],
-  '/budgets': ['Budgets', 'Track spending against your limits'],
-  '/analytics': ['Analytics', 'Spending trends & insights'],
-  '/savings': ['Savings Goals', 'Track your goals'],
-  '/ai': ['AI Budget', 'Ask anything about your money'],
+  '/': ['My Money', "Here's where you stand this month"],
+  '/income': ['Money In', "What's landing in your pocket"],
+  '/expenses': ['Spending', 'Where did it all go?'],
+  '/budgets': ['My Limits', 'Staying in the zone'],
+  '/analytics': ['The Breakdown', "Numbers don't lie"],
+  '/savings': ['Goals', 'Saving up for the good stuff'],
+  '/ai': ['Budget AI', 'Ask me anything about your money'],
 }
 
 export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
