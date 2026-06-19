@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
-import AppShell from '@/components/layout/AppShell'
+import { AuthProvider } from '@/components/providers/AuthProvider'
+import LayoutGate from '@/components/layout/LayoutGate'
 
 export const metadata: Metadata = {
   title: 'Budgetly - Personal Finance',
@@ -19,7 +20,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ThemeProvider>
-          <AppShell>{children}</AppShell>
+          <AuthProvider>
+            <LayoutGate>{children}</LayoutGate>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

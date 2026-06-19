@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, TrendingUp, CreditCard, PieChart,
-  Target, Wallet, X, ChevronRight, Sparkles
+  Target, Wallet, X, ChevronRight, Sparkles, LogOut
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/components/providers/AuthProvider'
 
 const NAV_ITEMS = [
   { href: '/', label: 'My Money', icon: LayoutDashboard },
@@ -38,6 +39,7 @@ function BudgetlyLogo({ size = 22 }: { size?: number }) {
 
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname()
+  const { user, signOut } = useAuth()
 
   const content = (
     <div className="flex flex-col h-full" style={{ background: 'var(--bg-secondary)', borderRight: '1px solid var(--border)' }}>
@@ -92,6 +94,23 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           )
         })}
       </nav>
+
+      {/* User + Sign out */}
+      <div className="px-3 py-3 border-t" style={{ borderColor: 'var(--border)' }}>
+        {user && (
+          <div className="px-3 py-2 mb-1">
+            <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{user.email}</p>
+          </div>
+        )}
+        <button
+          onClick={signOut}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[14px] text-sm font-semibold transition-all duration-150 hover:bg-[var(--bg-tertiary)]"
+          style={{ color: 'var(--text-secondary)' }}
+        >
+          <LogOut size={17} className="flex-shrink-0" />
+          <span>Sign Out</span>
+        </button>
+      </div>
 
     </div>
   )
