@@ -104,9 +104,9 @@ export default function LoginPage() {
           </div>
 
           {/* Heading */}
-          <div className="mb-6">
+          <div className="mb-6 text-center">
             <h2 className="text-xl font-bold mb-1" style={{ color: '#1f172a', fontFamily: "'Quicksand', sans-serif" }}>
-              {mode === 'signin' ? 'Welcome back 👋' : 'Create your account'}
+              {mode === 'signin' ? 'Welcome back' : 'Create your account'}
             </h2>
             <p className="text-sm" style={{ color: '#6b7280' }}>
               {mode === 'signin'
