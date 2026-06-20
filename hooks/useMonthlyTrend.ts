@@ -18,6 +18,8 @@ export function useMonthlyTrend(numMonths = 6): MonthlyPoint[] {
   useEffect(() => {
     if (!user) return
     async function load() {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
       const now = new Date()
       const results: MonthlyPoint[] = []
 

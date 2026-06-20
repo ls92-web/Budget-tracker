@@ -13,6 +13,8 @@ export function useExpenses(month?: number, year?: number) {
   const [error, setError] = useState<string | null>(null)
 
   const fetch = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
     setLoading(true)
     setError(null)
     try {

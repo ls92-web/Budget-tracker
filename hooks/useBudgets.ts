@@ -11,6 +11,8 @@ export function useBudgets(month: number, year: number) {
   const [loading, setLoading] = useState(true)
 
   const fetch = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
     setLoading(true)
     const { data } = await supabase
       .from('budgets')
