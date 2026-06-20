@@ -20,7 +20,7 @@ export type Category =
 export interface IncomeEntry {
   id: string
   amount: number
-  source: string
+  source?: string
   date: string
   notes?: string
   income_type: IncomeType

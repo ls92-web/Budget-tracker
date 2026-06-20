@@ -23,7 +23,6 @@ const INCOME_COLORS: Record<string, string> = {
 
 interface IncomeFormData {
   amount: string
-  source: string
   date: string
   notes: string
   income_type: IncomeType
@@ -31,7 +30,6 @@ interface IncomeFormData {
 
 const DEFAULT_FORM: IncomeFormData = {
   amount: '',
-  source: '',
   date: new Date().toISOString().split('T')[0],
   notes: '',
   income_type: 'salary',
@@ -58,7 +56,6 @@ export default function IncomePage() {
     setEditing(entry)
     setForm({
       amount: String(entry.amount),
-      source: entry.source,
       date: entry.date,
       notes: entry.notes || '',
       income_type: entry.income_type,
@@ -67,12 +64,11 @@ export default function IncomePage() {
   }
 
   const handleSave = async () => {
-    if (!form.amount || !form.source) return
+    if (!form.amount) return
     setSaving(true)
     try {
       const payload = {
         amount: parseFloat(form.amount),
-        source: form.source,
         date: form.date,
         notes: form.notes || undefined,
         income_type: form.income_type,
@@ -185,7 +181,7 @@ export default function IncomePage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
                   <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
-                    {entry.source}
+                    {INCOME_TYPES.find(t => t.value === entry.income_type)?.label ?? entry.income_type}
                   </p>
                   <Badge color={INCOME_COLORS[entry.income_type]}>
                     {INCOME_TYPES.find(t => t.value === entry.income_type)?.label}
@@ -249,12 +245,6 @@ export default function IncomePage() {
             />
           </div>
           <Input
-            label="Source"
-            placeholder="e.g. Monthly Salary, Freelance Project"
-            value={form.source}
-            onChange={e => setForm(f => ({ ...f, source: e.target.value }))}
-          />
-          <Input
             label="Date"
             type="date"
             value={form.date}
@@ -272,7 +262,7 @@ export default function IncomePage() {
               className="flex-1"
               onClick={handleSave}
               loading={saving}
-              disabled={!form.amount || !form.source}
+              disabled={!form.amount}
             >
               {editing ? 'Save Changes' : 'Add Income'}
             </Button>
