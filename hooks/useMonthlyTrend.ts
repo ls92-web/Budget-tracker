@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/components/providers/AuthProvider'
 import { getDaysInMonth } from '@/lib/utils'
 
 interface MonthlyPoint {
@@ -11,9 +12,11 @@ interface MonthlyPoint {
 }
 
 export function useMonthlyTrend(numMonths = 6): MonthlyPoint[] {
+  const { user } = useAuth()
   const [data, setData] = useState<MonthlyPoint[]>([])
 
   useEffect(() => {
+    if (!user) return
     async function load() {
       const now = new Date()
       const results: MonthlyPoint[] = []
@@ -40,7 +43,7 @@ export function useMonthlyTrend(numMonths = 6): MonthlyPoint[] {
       setData(results)
     }
     load()
-  }, [numMonths])
+  }, [numMonths, user])
 
   return data
 }

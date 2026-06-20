@@ -20,7 +20,7 @@ export function useSavings() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { fetch() }, [fetch])
+  useEffect(() => { if (user) fetch() }, [fetch, user])
 
   const add = async (goal: Omit<SavingsGoal, 'id' | 'created_at' | 'updated_at'>) => {
     const { data, error } = await supabase

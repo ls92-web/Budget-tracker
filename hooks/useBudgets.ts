@@ -22,7 +22,7 @@ export function useBudgets(month: number, year: number) {
     setLoading(false)
   }, [month, year])
 
-  useEffect(() => { fetch() }, [fetch])
+  useEffect(() => { if (user) fetch() }, [fetch, user])
 
   const upsert = async (budget: Omit<Budget, 'id' | 'created_at' | 'updated_at'>) => {
     const { data, error } = await supabase

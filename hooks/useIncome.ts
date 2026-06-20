@@ -38,7 +38,7 @@ export function useIncome(month?: number, year?: number) {
     }
   }, [month, year])
 
-  useEffect(() => { fetch() }, [fetch])
+  useEffect(() => { if (user) fetch() }, [fetch, user])
 
   const add = async (entry: Omit<IncomeEntry, 'id' | 'created_at' | 'updated_at'>) => {
     const { data, error: err } = await supabase
