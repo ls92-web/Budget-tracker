@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/components/providers/AuthProvider'
 import { SavingsGoal } from '@/lib/types'
 
 export function useSavings() {
+  const { user } = useAuth()
   const [goals, setGoals] = useState<SavingsGoal[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -23,7 +25,7 @@ export function useSavings() {
   const add = async (goal: Omit<SavingsGoal, 'id' | 'created_at' | 'updated_at'>) => {
     const { data, error } = await supabase
       .from('savings_goals')
-      .insert(goal)
+      .insert({ ...goal, user_id: user!.id })
       .select()
       .single()
     if (error) throw error

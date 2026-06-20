@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/components/providers/AuthProvider'
 import { ExpenseEntry, Category } from '@/lib/types'
 import { CATEGORY_COLORS, getDaysInMonth } from '@/lib/utils'
 
 export function useExpenses(month?: number, year?: number) {
+  const { user } = useAuth()
   const [entries, setEntries] = useState<ExpenseEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -41,7 +43,7 @@ export function useExpenses(month?: number, year?: number) {
   const add = async (entry: Omit<ExpenseEntry, 'id' | 'created_at' | 'updated_at'>) => {
     const { data, error: err } = await supabase
       .from('expense_entries')
-      .insert(entry)
+      .insert({ ...entry, user_id: user!.id })
       .select()
       .single()
     if (err) throw err

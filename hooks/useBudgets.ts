@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/components/providers/AuthProvider'
 import { Budget } from '@/lib/types'
 
 export function useBudgets(month: number, year: number) {
+  const { user } = useAuth()
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -25,7 +27,7 @@ export function useBudgets(month: number, year: number) {
   const upsert = async (budget: Omit<Budget, 'id' | 'created_at' | 'updated_at'>) => {
     const { data, error } = await supabase
       .from('budgets')
-      .upsert(budget, { onConflict: 'category,month,year' })
+      .upsert({ ...budget, user_id: user!.id }, { onConflict: 'user_id,category,month,year' })
       .select()
       .single()
     if (error) throw error
