@@ -86,10 +86,6 @@ export default function LoginPage() {
         setError('Please enter your full name.')
         return
       }
-      if (!dateOfBirth) {
-        setError('Please enter your date of birth.')
-        return
-      }
       if (!income || parseFloat(income) <= 0) {
         setError('Please enter a valid income amount.')
         return
@@ -211,10 +207,9 @@ export default function LoginPage() {
             {/* Sign-up only: Date of birth */}
             {mode === 'signup' && (
               <div>
-                <Label>Date of birth</Label>
+                <Label>Date of birth <span style={{ color: '#9ca3af', fontWeight: 400 }}>(optional)</span></Label>
                 <input
                   type="date"
-                  required
                   value={dateOfBirth}
                   onChange={e => setDateOfBirth(e.target.value)}
                   className={inputClass}

@@ -12,6 +12,7 @@ const PAGE_TITLES: Record<string, [string, string]> = {
   '/analytics': ['The Breakdown', "Numbers don't lie"],
   '/savings': ['Goals', 'Saving up for the good stuff'],
   '/ai': ['AI Budget', 'Ask me anything about your money'],
+  '/profile': ['My Profile', 'Manage your personal information'],
 }
 
 export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
