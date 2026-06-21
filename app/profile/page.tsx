@@ -93,14 +93,14 @@ export default function ProfilePage() {
     if (!user) return
     setProfileSaving(true)
     setProfileMsg(null)
-    const { error } = await supabase
-      .from('profiles')
-      .update({
+    const [{ error }] = await Promise.all([
+      supabase.from('profiles').update({
         full_name: profile.full_name || null,
         date_of_birth: profile.date_of_birth || null,
         updated_at: new Date().toISOString(),
-      })
-      .eq('id', user.id)
+      }).eq('id', user.id),
+      supabase.auth.updateUser({ data: { full_name: profile.full_name || null } }),
+    ])
     setProfileSaving(false)
     setProfileMsg(error
       ? { type: 'error', text: error.message }

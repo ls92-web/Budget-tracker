@@ -100,7 +100,12 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       <div className="px-3 py-3 border-t" style={{ borderColor: 'var(--border)' }}>
         {user && (
           <div className="px-3 py-2 mb-1">
-            <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{user.email}</p>
+            <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)', fontFamily: "'Quicksand', sans-serif" }}>
+              {user.user_metadata?.full_name || user.email}
+            </p>
+            {user.user_metadata?.full_name && (
+              <p className="text-xs truncate mt-0.5" style={{ color: 'var(--text-muted)' }}>{user.email}</p>
+            )}
           </div>
         )}
         <button
