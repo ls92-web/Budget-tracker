@@ -30,27 +30,13 @@ export default function PaymentCallbackPage() {
       }
 
       try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session) {
-          setStatus('error')
-          setMessage('Session expired. Please sign in and try again.')
-          setTimeout(() => router.push('/login'), 3000)
-          return
-        }
-
-        const res = await fetch('/api/subscription/verify-payment', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({ paymentId }),
+        const { data, error } = await supabase.functions.invoke('verify-payment', {
+          body: { paymentId },
         })
-        const data = await res.json()
 
-        if (!res.ok || data.error) {
+        if (error || data?.error) {
           setStatus('error')
-          setMessage(data.error || 'Could not verify payment. Please contact support.')
+          setMessage(data?.error || error?.message || 'Could not verify payment. Please contact support.')
           setTimeout(() => router.push('/ai'), 4000)
           return
         }

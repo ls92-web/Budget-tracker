@@ -378,14 +378,8 @@ export default function FinancialCoachPage() {
   const handleTrial = useCallback(async () => {
     setActionLoading(true)
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) return
-      const res = await fetch('/api/subscription/start-trial', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${session.access_token}` },
-      })
-      const data = await res.json()
-      if (data.error) { alert(data.error); return }
+      const { data, error } = await supabase.functions.invoke('start-trial')
+      if (error || data?.error) { alert(data?.error || error?.message || 'Failed to start trial'); return }
       sub.refetch()
     } finally {
       setActionLoading(false)
@@ -395,14 +389,8 @@ export default function FinancialCoachPage() {
   const handleSubscribe = useCallback(async () => {
     setActionLoading(true)
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) return
-      const res = await fetch('/api/subscription/create-payment', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${session.access_token}` },
-      })
-      const data = await res.json()
-      if (data.error) { alert(data.error); return }
+      const { data, error } = await supabase.functions.invoke('create-payment')
+      if (error || data?.error) { alert(data?.error || error?.message || 'Payment failed'); return }
       window.location.href = data.paymentUrl
     } finally {
       setActionLoading(false)
