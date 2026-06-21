@@ -11,7 +11,7 @@ const PAGE_TITLES: Record<string, [string, string]> = {
   '/budgets': ['My Limits', 'Staying in the zone'],
   '/analytics': ['The Breakdown', "Numbers don't lie"],
   '/savings': ['Goals', 'Saving up for the good stuff'],
-  '/ai': ['AI Budget', 'Ask me anything about your money'],
+  '/ai': ['Financial Coach', 'Your AI-powered money advisor'],
   '/profile': ['My Profile', 'Manage your personal information'],
 }
 

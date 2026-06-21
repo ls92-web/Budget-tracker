@@ -18,7 +18,7 @@ const NAV_ITEMS = [
   { href: '/budgets', label: 'My Limits', icon: Wallet },
   { href: '/analytics', label: 'The Breakdown', icon: PieChart },
   { href: '/savings', label: 'Goals', icon: Target },
-  { href: '/ai', label: 'AI Budget', icon: Sparkles },
+  { href: '/ai', label: 'Coach', icon: Sparkles },
   { href: '/profile', label: 'My Profile', icon: UserCircle },
 ]
 

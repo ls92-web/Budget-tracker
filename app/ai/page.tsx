@@ -1,9 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Sparkles, Send, User, AlertTriangle, Check } from 'lucide-react'
+import { BrainCircuit, Send, User, Target, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { useIncome } from '@/hooks/useIncome'
 import { useExpenses } from '@/hooks/useExpenses'
+import { useBudgets } from '@/hooks/useBudgets'
+import { useSavings } from '@/hooks/useSavings'
+import { useMonthlyTrend } from '@/hooks/useMonthlyTrend'
 import { getCurrentMonth, getCurrentYear, formatCurrency } from '@/lib/utils'
 import { Category } from '@/lib/types'
 
@@ -14,25 +17,29 @@ interface Message {
 
 const WELCOME: Message = {
   role: 'ai',
-  text: "Hi there! I'm AI Budget, your Budgetly assistant.\n\nAsk me about your spending, or log an expense in plain English — try \"Add KD 45 at Starbucks\".",
+  text: "Hey! I'm your Financial Coach.\n\nI can see your real income, spending, budgets, and savings goals — so ask me anything. Want to know if you can afford that vacation? How long until your savings goal is done? Where you're overspending? I'll give you a straight answer with a plan.",
 }
 
-const CHIPS = ['How much did I spend?', 'Biggest category?', 'Savings rate?', 'Give me a tip']
-const EXAMPLES = ['Add KD 12.5 at Starbucks', 'Spent KD 85 on groceries', 'Paid KD 150 for electricity']
+const CHIPS = [
+  'Am I on track this month?',
+  'Where am I overspending?',
+  'Can I afford a vacation?',
+  'How long to reach my goal?',
+]
 
-function BudgetlyIcon({ size = 21 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z" />
-      <line x1="3" y1="12" x2="21" y2="12" />
-      <line x1="16" y1="16" x2="19" y2="16" strokeWidth="2.5" />
-    </svg>
-  )
+const EXAMPLES = [
+  'Can I afford a new laptop next month?',
+  'How long until I save KWD 1,000?',
+  'What should I cut to save more?',
+]
+
+function CoachIcon({ size = 21 }: { size?: number }) {
+  return <BrainCircuit size={size} />
 }
 
 function guessCat(text: string): Category {
   const t = text.toLowerCase()
-  if (/coffee|starbucks|caribou|costa|cafe|latte|espresso/.test(t)) return 'Coffee'
+  if (/coffee|starbucks|caribou|costa|cafe|latte/.test(t)) return 'Coffee'
   if (/restaurant|food|lunch|dinner|grocer|pizza|mcdonald|burger|sushi/.test(t)) return 'Food & Dining'
   if (/uber|lyft|gas|fuel|transport|train|bus|parking|taxi|careem/.test(t)) return 'Transportation'
   if (/amazon|target|store|shop|clothes|mall|avenues|ikea/.test(t)) return 'Shopping'
@@ -48,21 +55,60 @@ function parseAmount(text: string): number | null {
   return m ? parseFloat(m[1].replace(',', '.')) : null
 }
 
-export default function LensAIPage() {
+function HealthBar({ pct }: { pct: number }) {
+  const color = pct >= 20 ? '#16a34a' : pct >= 10 ? '#d97706' : '#dc2626'
+  return (
+    <div style={{ height: 6, background: '#f3e8ef', borderRadius: 99, overflow: 'hidden' }}>
+      <div style={{ height: '100%', width: `${Math.min(pct * 5, 100)}%`, background: color, borderRadius: 99, transition: 'width .4s' }} />
+    </div>
+  )
+}
+
+export default function FinancialCoachPage() {
   const month = getCurrentMonth()
   const year = getCurrentYear()
   const { total: totalIncome } = useIncome(month, year)
   const { total: totalExpenses, categoryData, add: addExpense } = useExpenses(month, year)
+  const { budgets } = useBudgets(month, year)
+  const { goals } = useSavings()
+  const trend = useMonthlyTrend(4)
+
+  const net = totalIncome - totalExpenses
+  const savingsRate = totalIncome > 0 ? ((net / totalIncome) * 100) : 0
+  const savingsRateStr = savingsRate.toFixed(1)
+
+  const prevMonth = trend.length >= 2 ? trend[trend.length - 2] : null
+  const prevNet = prevMonth ? prevMonth.income - prevMonth.expenses : null
+  const netChange = prevNet !== null && prevNet !== 0 ? ((net - prevNet) / Math.abs(prevNet)) * 100 : null
+
+  const financialContext = {
+    currentMonth: {
+      label: new Date(year, month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+      income: totalIncome,
+      expenses: totalExpenses,
+      net,
+      savingsRate: savingsRateStr,
+    },
+    categoryBreakdown: categoryData.map(c => ({
+      category: c.category,
+      amount: c.amount,
+      percentage: c.percentage,
+    })),
+    budgets: budgets.map(b => ({ category: b.category, monthly_limit: b.monthly_limit })),
+    savingsGoals: goals.map(g => ({
+      name: g.name,
+      target_amount: g.target_amount,
+      current_amount: g.current_amount,
+      target_date: g.target_date,
+    })),
+    recentMonths: trend.slice(0, -1),
+  }
 
   const [messages, setMessages] = useState<Message[]>([WELCOME])
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
   const chatRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  const net = totalIncome - totalExpenses
-  const savingsRate = totalIncome > 0 ? ((net / totalIncome) * 100).toFixed(1) : '0.0'
-  const topCat = categoryData[0]
 
   useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight
@@ -79,7 +125,6 @@ export default function LensAIPage() {
     setStreaming(true)
     setMessages(prev => [...prev, { role: 'ai', text: '' }])
 
-    // Client-side expense logging intent
     const isExpense = /(add|spent|paid|bought|log)/i.test(trimmed)
     const amount = parseAmount(trimmed)
     if (isExpense && amount !== null) {
@@ -108,6 +153,7 @@ export default function LensAIPage() {
             role: m.role === 'ai' ? 'assistant' : 'user',
             content: m.text,
           })),
+          financialContext,
         }),
       })
 
@@ -141,7 +187,15 @@ export default function LensAIPage() {
       setStreaming(false)
       inputRef.current?.focus()
     }
-  }, [messages, streaming, addExpense])
+  }, [messages, streaming, addExpense, financialContext])
+
+  const healthLabel = savingsRate >= 20 ? 'Great shape' : savingsRate >= 10 ? 'Room to improve' : 'Needs attention'
+  const healthColor = savingsRate >= 20 ? '#16a34a' : savingsRate >= 10 ? '#d97706' : '#dc2626'
+
+  const overBudget = budgets.filter(b => {
+    const spent = categoryData.find(c => c.category === b.category)?.amount ?? 0
+    return spent / b.monthly_limit >= 0.9
+  })
 
   return (
     <>
@@ -158,34 +212,28 @@ export default function LensAIPage() {
       `}</style>
 
       <div style={{ fontFamily: "'Nunito', sans-serif", display: 'flex', flexDirection: 'column', height: '100%' }}>
-
-        {/* Main area — fills full container height */}
         <div className="ai-wrap" style={{ display: 'flex', gap: 16, flex: 1, minHeight: 0 }}>
 
           {/* Chat column */}
           <div className="ai-main" style={{
-            flex: 1,
-            background: '#fff',
-            border: '1px solid #f6d8e6',
-            borderRadius: 16,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            boxShadow: '0 1px 3px rgba(219,39,119,.08)',
+            flex: 1, background: '#fff', border: '1px solid #f6d8e6',
+            borderRadius: 16, display: 'flex', flexDirection: 'column',
+            overflow: 'hidden', boxShadow: '0 1px 3px rgba(219,39,119,.08)',
           }}>
             {/* Chat header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '15px 20px', borderBottom: '1px solid #f6d8e6' }}>
               <div style={{
-                width: 38, height: 38, borderRadius: 12, background: '#fde6f0',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ec4899', flexShrink: 0,
+                width: 38, height: 38, borderRadius: 12,
+                background: 'linear-gradient(135deg,#ec4899,#db2777)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0,
               }}>
-                <Sparkles size={18} />
+                <CoachIcon size={18} />
               </div>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#4a1d3a' }}>AI Budget</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#4a1d3a', fontFamily: "'Quicksand', sans-serif" }}>Financial Coach</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#db2777' }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#db2777', display: 'inline-block', animation: 'pulse 1.5s infinite' }} />
-                  Online · Ready to help
+                  Online · Knows your finances
                 </div>
               </div>
             </div>
@@ -199,14 +247,14 @@ export default function LensAIPage() {
                     <div style={{
                       width: 30, height: 30, borderRadius: 10, flexShrink: 0,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: isUser ? '#fdecf4' : '#fde6f0',
-                      color: isUser ? '#845870' : '#ec4899',
+                      background: isUser ? '#fdecf4' : 'linear-gradient(135deg,#ec4899,#db2777)',
+                      color: isUser ? '#845870' : '#fff',
                     }}>
-                      {isUser ? <User size={14} /> : <Sparkles size={14} />}
+                      {isUser ? <User size={14} /> : <CoachIcon size={14} />}
                     </div>
                     <div style={{
                       maxWidth: '78%', padding: '10px 14px', borderRadius: 16,
-                      fontSize: 13, lineHeight: 1.5, whiteSpace: 'pre-line',
+                      fontSize: 13, lineHeight: 1.6, whiteSpace: 'pre-line',
                       background: isUser ? '#ec4899' : '#fdecf4',
                       color: isUser ? '#fff' : '#4a1d3a',
                     }}>
@@ -254,12 +302,11 @@ export default function LensAIPage() {
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') send(input) }}
                 disabled={streaming}
-                placeholder='Ask a question or say "Add KD 50 at Whole Foods"'
+                placeholder='Ask anything — "Can I afford a trip to Turkey in 3 months?"'
                 style={{
                   flex: 1, padding: '10px 14px', borderRadius: 12,
                   border: '1px solid #f6d8e6', background: '#fdecf4',
-                  fontSize: 13, color: '#4a1d3a', outline: 'none',
-                  fontFamily: 'inherit',
+                  fontSize: 13, color: '#4a1d3a', outline: 'none', fontFamily: 'inherit',
                 }}
               />
               <button
@@ -284,51 +331,87 @@ export default function LensAIPage() {
           {/* Sidebar */}
           <div className="ai-side" style={{ width: 250, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto' }}>
 
-            {/* Spending Insights */}
+            {/* Financial Health */}
             <div style={{ background: '#fff', border: '1px solid #f6d8e6', borderRadius: 14, padding: 16, boxShadow: '0 1px 3px rgba(219,39,119,.08)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: '#4a1d3a', marginBottom: 12 }}>
-                <AlertTriangle size={14} style={{ color: '#e11d48', flexShrink: 0 }} />
-                Spending Insights
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#4a1d3a', marginBottom: 10, fontFamily: "'Quicksand', sans-serif" }}>Financial Health</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: healthColor }}>{healthLabel}</span>
+                <span style={{ fontSize: 11, color: '#b07f99' }}>Savings {savingsRateStr}%</span>
               </div>
-              <div style={{ display: 'flex', gap: 8, padding: '9px 11px', background: '#fff6fb', borderRadius: 10, marginBottom: 7, fontSize: 11, lineHeight: 1.45, color: '#845870' }}>
-                <AlertTriangle size={12} style={{ color: '#e11d48', flexShrink: 0, marginTop: 1 }} />
-                {topCat
-                  ? `${topCat.category} is ${topCat.percentage.toFixed(0)}% of spending — your largest category this month.`
-                  : 'No spending data yet for this month.'}
+              <HealthBar pct={savingsRate} />
+              <div style={{ marginTop: 10, fontSize: 11, color: '#845870', lineHeight: 1.5 }}>
+                {savingsRate >= 20
+                  ? `You're saving ${savingsRateStr}% of your income — above the 20% target. Keep it up.`
+                  : savingsRate >= 10
+                    ? `You're saving ${savingsRateStr}%. Push to 20% by trimming your top spending category.`
+                    : totalIncome === 0
+                      ? 'No income logged this month yet.'
+                      : `Only ${savingsRateStr}% saved this month. Ask me how to turn this around.`
+                }
               </div>
-              <div style={{ display: 'flex', gap: 8, padding: '9px 11px', background: '#fff6fb', borderRadius: 10, fontSize: 11, lineHeight: 1.45, color: '#845870' }}>
-                <Check size={12} style={{ color: '#db2777', flexShrink: 0, marginTop: 1 }} />
-                {parseFloat(savingsRate) >= 20
-                  ? `Excellent savings rate of ${savingsRate}% — well above the 20% target.`
-                  : `Your savings rate is ${savingsRate}% — try to reach the 20% target.`}
-              </div>
+              {netChange !== null && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8, fontSize: 11, color: netChange >= 0 ? '#16a34a' : '#dc2626' }}>
+                  {netChange >= 0
+                    ? <TrendingUp size={12} />
+                    : netChange < -0.5
+                      ? <TrendingDown size={12} />
+                      : <Minus size={12} />
+                  }
+                  {Math.abs(netChange).toFixed(0)}% vs last month
+                </div>
+              )}
             </div>
 
             {/* This Month */}
             <div style={{ background: '#fff', border: '1px solid #f6d8e6', borderRadius: 14, padding: 16, boxShadow: '0 1px 3px rgba(219,39,119,.08)' }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#4a1d3a', marginBottom: 10 }}>This Month</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#4a1d3a', marginBottom: 10, fontFamily: "'Quicksand', sans-serif" }}>This Month</div>
               {[
-                { label: 'Income', value: formatCurrency(totalIncome), color: '#db2777' },
-                { label: 'Expenses', value: formatCurrency(totalExpenses), color: '#9d174d' },
-                { label: 'Balance', value: formatCurrency(net), color: '#ec4899' },
+                { label: 'Income', value: formatCurrency(totalIncome), color: '#16a34a' },
+                { label: 'Spent', value: formatCurrency(totalExpenses), color: '#9d174d' },
+                { label: 'Left over', value: formatCurrency(net), color: net >= 0 ? '#db2777' : '#dc2626' },
               ].map((row, i, arr) => (
-                <div
-                  key={row.label}
-                  style={{
-                    display: 'flex', justifyContent: 'space-between',
-                    fontSize: 11, padding: '6px 0',
-                    borderBottom: i < arr.length - 1 ? '1px solid #fbe1ec' : 'none',
-                  }}
-                >
+                <div key={row.label} style={{
+                  display: 'flex', justifyContent: 'space-between',
+                  fontSize: 11, padding: '6px 0',
+                  borderBottom: i < arr.length - 1 ? '1px solid #fbe1ec' : 'none',
+                }}>
                   <span style={{ color: '#b07f99' }}>{row.label}</span>
                   <span style={{ color: row.color, fontWeight: 600 }}>{row.value}</span>
                 </div>
               ))}
+              {overBudget.length > 0 && (
+                <div style={{ marginTop: 10, padding: '8px 10px', background: '#fff1f2', borderRadius: 8, fontSize: 11, color: '#9f1239', lineHeight: 1.45 }}>
+                  ⚠️ {overBudget.map(b => b.category).join(', ')} {overBudget.length === 1 ? 'is' : 'are'} near the budget limit.
+                </div>
+              )}
             </div>
+
+            {/* Savings Goals */}
+            {goals.length > 0 && (
+              <div style={{ background: '#fff', border: '1px solid #f6d8e6', borderRadius: 14, padding: 16, boxShadow: '0 1px 3px rgba(219,39,119,.08)' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#4a1d3a', marginBottom: 10, fontFamily: "'Quicksand', sans-serif", display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <Target size={13} style={{ color: '#ec4899' }} /> Savings Goals
+                </div>
+                {goals.slice(0, 3).map(g => {
+                  const pct = g.target_amount > 0 ? Math.min((g.current_amount / g.target_amount) * 100, 100) : 0
+                  return (
+                    <div key={g.id} style={{ marginBottom: 10 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
+                        <span style={{ color: '#4a1d3a', fontWeight: 600, maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.name}</span>
+                        <span style={{ color: '#b07f99' }}>{pct.toFixed(0)}%</span>
+                      </div>
+                      <div style={{ height: 5, background: '#f3e8ef', borderRadius: 99, overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${pct}%`, background: g.color || '#ec4899', borderRadius: 99, transition: 'width .4s' }} />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
 
             {/* Try Asking */}
             <div style={{ background: '#fff', border: '1px solid #f6d8e6', borderRadius: 14, padding: 16, boxShadow: '0 1px 3px rgba(219,39,119,.08)' }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#4a1d3a', marginBottom: 10 }}>Try Asking</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#4a1d3a', marginBottom: 10, fontFamily: "'Quicksand', sans-serif" }}>Try Asking</div>
               {EXAMPLES.map(ex => (
                 <button
                   key={ex}
@@ -354,4 +437,3 @@ export default function LensAIPage() {
     </>
   )
 }
-
