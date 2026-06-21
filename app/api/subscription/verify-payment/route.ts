@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createUserClient } from '@/lib/supabase-server'
 
-const MYFATOORAH_BASE = 'https://api.myfatoorah.com'
+const MYFATOORAH_BASE = 'https://apitest.myfatoorah.com'
 
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get('Authorization')
