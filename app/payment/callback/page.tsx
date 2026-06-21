@@ -20,7 +20,7 @@ function CallbackInner() {
         return
       }
 
-      const paymentId = params.get('PaymentId')
+      const paymentId = params.get('PaymentId') || params.get('paymentId')
       if (!paymentId) {
         setStatus('error')
         setMessage('Payment reference not found. If you were charged, please contact support.')
@@ -28,13 +28,41 @@ function CallbackInner() {
       }
 
       try {
+        // Wait for the session to be restored from storage after the redirect
+        let session = null
+        for (let i = 0; i < 10; i++) {
+          const { data: { session: s } } = await supabase.auth.getSession()
+          if (s) { session = s; break }
+          await new Promise(r => setTimeout(r, 200))
+        }
+
+        if (!session) {
+          setStatus('error')
+          setMessage('Session expired. Please sign in again and contact support if you were charged.')
+          return
+        }
+
         const { data, error } = await supabase.functions.invoke('verify-payment', {
           body: { paymentId },
+          headers: { Authorization: `Bearer ${session.access_token}` },
         })
 
-        if (error || data?.error) {
+        // Extract the real error message from whichever place supabase-js puts it
+        let errMsg: string | null = null
+        if (data?.error) errMsg = data.error
+        else if (error) {
+          try {
+            // Newer supabase-js versions put the body in error.context
+            const body = await (error as { context?: Response }).context?.json?.()
+            errMsg = body?.error || error.message
+          } catch {
+            errMsg = error.message
+          }
+        }
+
+        if (errMsg) {
           setStatus('error')
-          setMessage(data?.error || error?.message || 'Could not verify your payment. Please contact support.')
+          setMessage(errMsg)
           return
         }
 
@@ -42,9 +70,9 @@ function CallbackInner() {
         setMessage(data.subscriptionEndsAt
           ? `Your subscription is active until ${new Date(data.subscriptionEndsAt).toLocaleDateString('en-KW', { day: 'numeric', month: 'long', year: 'numeric' })}.`
           : 'Your subscription is now active.')
-      } catch {
+      } catch (e) {
         setStatus('error')
-        setMessage('An unexpected error occurred. If you were charged, please contact support.')
+        setMessage(e instanceof Error ? e.message : 'An unexpected error occurred. If you were charged, please contact support.')
       }
     }
 
