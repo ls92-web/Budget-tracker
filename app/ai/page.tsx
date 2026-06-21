@@ -454,10 +454,13 @@ export default function FinancialCoachPage() {
   const handleSubscribe = useCallback(async () => {
     setActionLoading(true)
     try {
-      // Fetch available payment methods first
       const { data, error } = await supabase.functions.invoke('create-payment')
-      if (error || data?.error) { alert(data?.error || error?.message || 'Could not load payment methods'); return }
+      if (error) { alert(error.message || 'Could not load payment methods'); return }
+      if (data?.error) { alert(data.error); return }
+      if (!data?.methods?.length) { alert('No payment methods available'); return }
       setPaymentMethods(data.methods)
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Unexpected error')
     } finally {
       setActionLoading(false)
     }
@@ -467,8 +470,12 @@ export default function FinancialCoachPage() {
     setPayingMethod(true)
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', { body: { methodId } })
-      if (error || data?.error) { alert(data?.error || error?.message || 'Payment failed'); return }
+      if (error) { alert(error.message || 'Payment failed'); return }
+      if (data?.error) { alert(data.error); return }
+      if (!data?.paymentUrl) { alert('No payment URL returned'); return }
       window.location.href = data.paymentUrl
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Payment error')
     } finally {
       setPayingMethod(false)
     }
