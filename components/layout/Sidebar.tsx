@@ -44,16 +44,27 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname()
   const { user, signOut } = useAuth()
   const [displayName, setDisplayName] = useState<string | null>(null)
+  const [subStatus, setSubStatus] = useState<string>('none')
+  const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null)
 
   useEffect(() => {
     if (!user) return
     supabase
       .from('profiles')
-      .select('full_name')
+      .select('full_name, subscription_status, trial_ends_at')
       .eq('id', user.id)
       .single()
-      .then(({ data }) => setDisplayName(data?.full_name ?? null))
+      .then(({ data }) => {
+        setDisplayName(data?.full_name ?? null)
+        setSubStatus(data?.subscription_status ?? 'none')
+        if (data?.trial_ends_at) setTrialEndsAt(new Date(data.trial_ends_at))
+      })
   }, [user])
+
+  const now = new Date()
+  const isTrialActive = subStatus === 'trial' && trialEndsAt && trialEndsAt > now
+  const trialDaysLeft = isTrialActive ? Math.ceil((trialEndsAt!.getTime() - now.getTime()) / 86400000) : 0
+  const isPremium = subStatus === 'active'
 
   const content = (
     <div className="flex flex-col h-full" style={{ background: 'var(--bg-secondary)', borderRight: '1px solid var(--border)' }}>
@@ -103,6 +114,12 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             >
               <Icon size={17} className="flex-shrink-0" />
               <span className="flex-1">{label}</span>
+              {href === '/ai' && isPremium && (
+                <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.05em', background: active ? 'rgba(255,255,255,0.25)' : 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#fff', borderRadius: 4, padding: '2px 5px' }}>PRO</span>
+              )}
+              {href === '/ai' && isTrialActive && !isPremium && (
+                <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: '0.05em', background: active ? 'rgba(255,255,255,0.25)' : '#8b5cf6', color: '#fff', borderRadius: 4, padding: '2px 5px' }}>{trialDaysLeft}d</span>
+              )}
               {active && <ChevronRight size={12} className="opacity-70" />}
             </Link>
           )
