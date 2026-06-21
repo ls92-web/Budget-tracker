@@ -489,11 +489,21 @@ export default function FinancialCoachPage() {
 
   if (!isActive) {
     return (
-      <Paywall
-        onTrial={handleTrial}
-        onSubscribe={handleSubscribe}
-        loading={actionLoading}
-      />
+      <>
+        {paymentMethods && (
+          <PaymentModal
+            methods={paymentMethods}
+            onSelect={async (methodId) => { setPaymentMethods(null); await handlePay(methodId) }}
+            onClose={() => setPaymentMethods(null)}
+            loading={payingMethod}
+          />
+        )}
+        <Paywall
+          onTrial={handleTrial}
+          onSubscribe={handleSubscribe}
+          loading={actionLoading}
+        />
+      </>
     )
   }
 
