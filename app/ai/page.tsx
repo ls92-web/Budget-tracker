@@ -19,6 +19,69 @@ import { supabase } from '@/lib/supabase'
 /* ─── Types ─────────────────────────────────────────────── */
 interface Message { role: 'ai' | 'user'; text: string }
 
+interface PaymentMethod {
+  PaymentMethodId: string
+  PaymentMethodEn: string
+  PaymentMethodAr: string
+  ServiceCharge: number
+  TotalAmount: number
+  ImageUrl: string
+}
+
+function PaymentModal({ methods, onSelect, onClose, loading }: {
+  methods: PaymentMethod[]
+  onSelect: (methodId: string) => void
+  onClose: () => void
+  loading: boolean
+}) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)' }}>
+      <div style={{ background: '#fff', borderRadius: 22, padding: 28, width: '100%', maxWidth: 420, boxShadow: '0 24px 64px rgba(0,0,0,0.2)', border: '1.5px solid #f9a8d4' }}>
+        <div style={{ marginBottom: 20 }}>
+          <h3 style={{ fontSize: 17, fontWeight: 800, color: '#1f172a', fontFamily: "'Quicksand', sans-serif", margin: 0 }}>Choose Payment Method</h3>
+          <p style={{ fontSize: 12, color: '#9ca3af', margin: '4px 0 0' }}>Select how you'd like to pay 4.000 KWD/month</p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {methods.map(m => (
+            <button
+              key={m.PaymentMethodId}
+              onClick={() => onSelect(m.PaymentMethodId)}
+              disabled={loading}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 14,
+                padding: '14px 16px', borderRadius: 14,
+                border: '1.5px solid #f3e8ef', background: '#fff',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all .15s', textAlign: 'left',
+                opacity: loading ? 0.6 : 1,
+              }}
+              onMouseEnter={e => { if (!loading) { (e.currentTarget as HTMLButtonElement).style.borderColor = '#ec4899'; (e.currentTarget as HTMLButtonElement).style.background = '#fff6fb' } }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#f3e8ef'; (e.currentTarget as HTMLButtonElement).style.background = '#fff' }}
+            >
+              {m.ImageUrl && (
+                <img src={m.ImageUrl} alt={m.PaymentMethodEn} style={{ width: 44, height: 28, objectFit: 'contain', borderRadius: 6, flexShrink: 0 }} />
+              )}
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#1f172a' }}>{m.PaymentMethodEn}</div>
+                {m.ServiceCharge > 0 && (
+                  <div style={{ fontSize: 11, color: '#9ca3af' }}>Service charge: {m.ServiceCharge} KWD</div>
+                )}
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#ec4899' }}>{m.TotalAmount.toFixed(3)} KWD</div>
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={onClose}
+          style={{ marginTop: 16, width: '100%', padding: '10px', borderRadius: 12, border: '1px solid #f3e8ef', background: 'transparent', color: '#9ca3af', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+}
+
 /* ─── Constants ─────────────────────────────────────────── */
 const FEATURES = [
   { icon: BrainCircuit, text: 'Personalised coaching based on your real data' },
@@ -300,6 +363,8 @@ export default function FinancialCoachPage() {
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[] | null>(null)
+  const [payingMethod, setPayingMethod] = useState(false)
   const chatRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -389,11 +454,23 @@ export default function FinancialCoachPage() {
   const handleSubscribe = useCallback(async () => {
     setActionLoading(true)
     try {
+      // Fetch available payment methods first
       const { data, error } = await supabase.functions.invoke('create-payment')
+      if (error || data?.error) { alert(data?.error || error?.message || 'Could not load payment methods'); return }
+      setPaymentMethods(data.methods)
+    } finally {
+      setActionLoading(false)
+    }
+  }, [])
+
+  const handlePay = useCallback(async (methodId: string) => {
+    setPayingMethod(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment', { body: { methodId } })
       if (error || data?.error) { alert(data?.error || error?.message || 'Payment failed'); return }
       window.location.href = data.paymentUrl
     } finally {
-      setActionLoading(false)
+      setPayingMethod(false)
     }
   }, [])
 
@@ -422,6 +499,14 @@ export default function FinancialCoachPage() {
 
   return (
     <>
+      {paymentMethods && (
+        <PaymentModal
+          methods={paymentMethods}
+          onSelect={async (methodId) => { setPaymentMethods(null); await handlePay(methodId) }}
+          onClose={() => setPaymentMethods(null)}
+          loading={payingMethod}
+        />
+      )}
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
