@@ -2,12 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, TrendingUp, CreditCard, PieChart,
   Target, Wallet, X, ChevronRight, Sparkles, LogOut, UserCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { supabase } from '@/lib/supabase'
 
 const NAV_ITEMS = [
   { href: '/', label: 'My Money', icon: LayoutDashboard },
@@ -41,6 +43,17 @@ function BudgetlyLogo({ size = 22 }: { size?: number }) {
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname()
   const { user, signOut } = useAuth()
+  const [displayName, setDisplayName] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!user) return
+    supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => setDisplayName(data?.full_name ?? null))
+  }, [user])
 
   const content = (
     <div className="flex flex-col h-full" style={{ background: 'var(--bg-secondary)', borderRight: '1px solid var(--border)' }}>
@@ -101,9 +114,9 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         {user && (
           <div className="px-3 py-2 mb-1">
             <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)', fontFamily: "'Quicksand', sans-serif" }}>
-              {user.user_metadata?.full_name || user.email}
+              {displayName || user.email}
             </p>
-            {user.user_metadata?.full_name && (
+            {displayName && (
               <p className="text-xs truncate mt-0.5" style={{ color: 'var(--text-muted)' }}>{user.email}</p>
             )}
           </div>
