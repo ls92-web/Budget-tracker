@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { createUserClient } from '@/lib/supabase-server'
 
 interface CategoryItem { category: string; amount: number; percentage: number }
 interface BudgetItem { category: string; monthly_limit: number }
@@ -83,12 +84,42 @@ function buildSystemPrompt(ctx: FinancialContext | null): string {
 }
 
 export async function POST(request: NextRequest) {
-  const { messages, financialContext } = await request.json()
+  // Auth — require a valid bearer token
+  const token = request.headers.get('Authorization')?.replace('Bearer ', '')
+  if (!token) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const supabase = createUserClient(token)
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // Subscription gate — must have an active trial or paid subscription
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('subscription_status, trial_ends_at, subscription_ends_at')
+    .eq('id', user.id)
+    .single()
+
+  const now = new Date()
+  const trialActive = profile?.subscription_status === 'trial'
+    && profile?.trial_ends_at
+    && new Date(profile.trial_ends_at) > now
+  const subActive = profile?.subscription_status === 'active'
+    && profile?.subscription_ends_at
+    && new Date(profile.subscription_ends_at) > now
+
+  if (!trialActive && !subActive) {
+    return Response.json({ error: 'Subscription required' }, { status: 403 })
+  }
 
   const apiKey = process.env.OPENROUTER_API_KEY
   if (!apiKey) {
     return Response.json({ error: 'AI assistant not configured' }, { status: 503 })
   }
+
+  const { messages, financialContext } = await request.json()
+
+  // Cap message history to last 20 turns to limit token usage
+  const trimmedMessages = Array.isArray(messages) ? messages.slice(-20) : []
 
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -101,9 +132,10 @@ export async function POST(request: NextRequest) {
     body: JSON.stringify({
       model: 'openai/gpt-oss-120b:free',
       stream: true,
+      max_tokens: 1024,
       messages: [
         { role: 'system', content: buildSystemPrompt(financialContext ?? null) },
-        ...messages,
+        ...trimmedMessages,
       ],
     }),
   })

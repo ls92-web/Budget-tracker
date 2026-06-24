@@ -404,9 +404,13 @@ export default function FinancialCoachPage() {
     }
 
     try {
+      const { data: { session: chatSession } } = await supabase.auth.getSession()
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(chatSession ? { 'Authorization': `Bearer ${chatSession.access_token}` } : {}),
+        },
         body: JSON.stringify({
           messages: history.map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.text })),
           financialContext,
