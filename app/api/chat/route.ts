@@ -86,11 +86,17 @@ function buildSystemPrompt(ctx: FinancialContext | null): string {
 export async function POST(request: NextRequest) {
   // Auth — require a valid bearer token
   const token = request.headers.get('Authorization')?.replace('Bearer ', '')
-  if (!token) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!token) {
+    console.log(JSON.stringify({ event: 'chat_auth_missing', ip: request.headers.get('x-forwarded-for') }))
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   const supabase = createUserClient(token)
   const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (authError || !user) {
+    console.log(JSON.stringify({ event: 'chat_auth_failure', error: authError?.message }))
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   // Subscription gate — must have an active trial or paid subscription
   const { data: profile } = await supabase
@@ -108,6 +114,7 @@ export async function POST(request: NextRequest) {
     && new Date(profile.subscription_ends_at) > now
 
   if (!trialActive && !subActive) {
+    console.log(JSON.stringify({ event: 'chat_subscription_gate', user_id: user.id, status: profile?.subscription_status }))
     return Response.json({ error: 'Subscription required' }, { status: 403 })
   }
 

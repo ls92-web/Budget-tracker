@@ -664,6 +664,9 @@ export default function FinancialCoachPage() {
                 <Send size={14} /> Send
               </button>
             </div>
+            <p style={{ fontSize: 11, color: '#b07f99', textAlign: 'center', margin: '4px 0 0', padding: '0 16px' }}>
+              Your financial data is shared with the AI model to personalise responses. No data is stored by the AI provider.
+            </p>
           </div>
 
           {/* ── Right sidebar ── */}
